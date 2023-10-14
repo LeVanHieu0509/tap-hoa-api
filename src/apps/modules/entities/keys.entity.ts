@@ -21,13 +21,6 @@ export class Keys {
   @PrimaryGeneratedColumn()
   public id!: number;
 
-  @Field((_type) => Users)
-  @ManyToOne((_type) => Users, (users: Users) => users.keys, {
-    primary: true,
-  })
-  @JoinColumn({ name: "usr_id" })
-  public usr_id!: Users;
-
   @Field((_type) => String)
   @Column({ type: "varchar", nullable: true })
   public publicKey!: string;
@@ -53,4 +46,11 @@ export class Keys {
   @Column()
   @UpdateDateColumn()
   public updatedAt!: Date;
+
+  @Field((_type) => Users)
+  @ManyToOne((_type) => Users, (users: Users) => users.keys, {
+    primary: true,
+  })
+  @JoinColumn({ name: "usr_id" })
+  public usr_id!: Users;
 }

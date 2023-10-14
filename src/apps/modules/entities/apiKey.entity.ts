@@ -15,7 +15,7 @@ import {
 })
 export class ApiKey {
   @Field((_type) => Number)
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: "int" })
   public id!: number;
 
   @Field((_type) => String)
