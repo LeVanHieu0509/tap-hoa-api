@@ -1,7 +1,7 @@
-import { getCustomRepository, getRepository } from "typeorm";
-import User from "../../modules/entities/users.entity";
-import { UsersRepository } from "../../repositories/users.repository";
-class UserService {
+import { getCustomRepository } from "typeorm";
+import User from "../modules/entities/users.entity";
+import { UsersRepository } from "../repositories/users.repository";
+class UsersService {
   constructor(parameters) {}
 
   public static insert = async ({ batchSize, totalSize }) => {
@@ -29,6 +29,14 @@ class UserService {
       .values(values)
       .execute();
   };
+
+  public static login = async ({ email, password, refreshToken }: any) => {};
+
+  public static logout = async (keystore) => {};
+
+  public static signUp = async ({ email, password, roles }: any) => {};
+
+  public static changePass = async ({ email, password }, userId) => {};
 }
 
-export default UserService;
+export default UsersService;

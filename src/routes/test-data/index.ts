@@ -1,5 +1,5 @@
 import RabbitMQController from "../../apps/controller/rabbit-mq";
-import UserController from "../../apps/controller/user";
+import UserController from "../../apps/controller/auth.controller";
 import { asyncHandler } from "../../helpers/asyncHandler";
 
 const router = require("express").Router();

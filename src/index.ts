@@ -7,7 +7,6 @@ import "reflect-metadata";
 import { Container } from "typedi";
 import * as TypeORM from "typeorm";
 import route from "./routes";
-import rabbitMQService from "./apps/services/consumerQueue.service";
 import cors = require("cors");
 
 //nằm ở đây và chiếm bộ nhớ. có thể gây ra conflict khi đặt.
