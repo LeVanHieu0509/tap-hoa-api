@@ -1,0 +1,7 @@
+coverage
+testApp
+dist
+build
+.cache
+.next
+public

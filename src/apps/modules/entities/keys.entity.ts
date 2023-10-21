@@ -27,7 +27,7 @@ export class Keys {
 
   @Field((_type) => String)
   @Column({ type: "varchar", nullable: true })
-  public privatekey!: string;
+  public privateKey!: string;
 
   @Field((_type) => String)
   @Column({ type: "varchar", nullable: true })

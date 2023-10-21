@@ -8,9 +8,10 @@ import { Container } from "typedi";
 import * as TypeORM from "typeorm";
 import route from "./routes";
 import cors = require("cors");
-
+import { ApolloServer } from "apollo-server-express";
+import { GraphQLError, GraphQLFormattedError } from "graphql";
 //nằm ở đây và chiếm bộ nhớ. có thể gây ra conflict khi đặt.
-
+import buildSchema from "./apps/modules/graphql/schema";
 dotenv.config();
 
 // register 3rd party IOC container
@@ -38,11 +39,35 @@ const bootstrap = async () => {
 
     app.use(cors(corsConfig));
 
-    app.listen(3000, () => {
-      console.log(`Listening on port ${3000}`);
+    //Apolo server sẽ tạo graphql server,
+    //playGround: true: có thể test các schema trực tiếp tại localhost localhos:
+    const schema = await buildSchema(Container);
+
+    const server = new ApolloServer({
+      schema,
+      context: ({ req, res }) => ({ req, res }),
+      debug: true,
+      playground: true,
+      formatError: (error: GraphQLError): GraphQLFormattedError => {
+        if (error && error.extensions) {
+          error.extensions.code = "GRAPHQL_VALIDATION_FAILED";
+        }
+        return error;
+      },
+    });
+
+    server.applyMiddleware({ app, cors: corsConfig });
+    route(app);
+    let port = 3000;
+    const serverVip = app.listen({ port }, () => {
+      console.log(`🚀 Server ready at http://localhost:${port}${server.graphqlPath}`);
+    });
+
+    process.on("SIGINT", () => {
+      serverVip.close(() => console.log("Exit Server Express"));
     });
   } catch (err) {
-    console.error(err);
+    console.error("App", err);
   }
 };
 

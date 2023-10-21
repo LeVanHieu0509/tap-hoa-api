@@ -34,7 +34,7 @@ export class Users {
   public usr_email!: string;
 
   @Field()
-  @Column({ type: "int", nullable: true, default: "0" })
+  @Column({ type: "int", nullable: true })
   public usr_age!: number;
 
   @Field()
@@ -43,13 +43,41 @@ export class Users {
   public usr_name!: string;
 
   @Field()
-  @Column({ type: "int", nullable: true, default: "0" })
+  @Column({ type: "int", nullable: true, default: "1" })
   public usr_status!: number;
 
   @Field()
   @Column({ type: "varchar", nullable: true, collation: "utf8mb4_bin" })
   @Length(0, 128)
   public usr_address!: string;
+
+  @Field((_type) => String)
+  @Column({ type: "varchar", nullable: true })
+  public usr_roles!: string;
+
+  @Field()
+  @Column({ type: "varchar", nullable: true })
+  public usr_pass!: string;
+
+  @Field()
+  @Column({ type: "varchar", nullable: true })
+  public usr_phone!: string;
+
+  @Field()
+  @Column({ type: "int", nullable: true })
+  public usr_lock_count!: number;
+
+  @Field()
+  @Column({ type: "datetime", nullable: true })
+  public usr_lock_time!: string;
+
+  @Field()
+  @Column({ type: "int", nullable: true })
+  public usr_reset_password!: number;
+
+  @Field()
+  @Column({ type: "smallint", nullable: true })
+  public usr_migration!: number;
 
   @Field()
   @UpdateDateColumn()

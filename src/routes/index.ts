@@ -1,10 +1,25 @@
+import APIError from "../apps/global/response/apierror";
+import auth from "./auth/index";
+
 function route(app) {
-  // app.use(
-  //     "/v1/api/socket-io",
-  //     function (req, res, next) {
-  //         next();
-  //     },
-  //     socket
-  // );
+  app.use(
+    "/v1/api",
+    function (req, res, next) {
+      next();
+    },
+    auth
+  );
+  app.use((req, res, next) => {
+    const error = new APIError("Not Found", 1237, 404);
+    next(error);
+  });
+  app.use((error, req, res, next) => {
+    const statusCode = error.status || 500;
+    return res.status(statusCode).json({
+      status: "error",
+      code: statusCode,
+      message: error.message || "Internal Server Error",
+    });
+  });
 }
 export default route;
