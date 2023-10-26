@@ -34,6 +34,15 @@ class KeyTokenService {
       return error;
     }
   };
+
+  public static getKeyStoreByUserId = async ({ usr_id }) => {
+    const keysRepository = getCustomRepository(KeysRepository);
+    const keyUser = await keysRepository.findOne({ usr_id });
+
+    return {
+      keyUser,
+    };
+  };
 }
 
 export default KeyTokenService;

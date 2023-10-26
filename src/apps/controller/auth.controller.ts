@@ -22,7 +22,21 @@ class AuthController {
     }
   };
 
-  public static login = async (req: RequestCustom, res: Response, next: NextFunction) => {};
+  public static refreshToken = async (req: RequestCustom, res: Response, next: NextFunction) => {};
+
+  public static login = async (req: RequestCustom, res: Response, next: NextFunction) => {
+    try {
+      new SuccessResponse({
+        message: "Login Process!",
+        metadata: await AuthService.login(req.body),
+        // options: {
+        //   limit: 10,
+        // },
+      }).send(res);
+    } catch (error) {
+      next(error);
+    }
+  };
 
   public static logout = async (req: RequestCustom, res: Response, next: NextFunction) => {};
 

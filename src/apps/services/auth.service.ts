@@ -6,6 +6,7 @@ import crypto from "node:crypto";
 import KeyTokenService from "./keyToken.service";
 import { createTokenPair } from "../auth/authUtils";
 import _ from "lodash";
+import { findByUsername } from "./user.service";
 
 const RoleUser = {
   USER: "USER",
@@ -36,9 +37,41 @@ class AuthService {
     await usersRepository.createQueryBuilder().insert().into(User).values(values).execute();
   };
 
-  public static login = async ({ email, password, refreshToken }: any) => {};
+  public static login = async ({ usr_name, usr_pass, refreshToken }: any) => {
+    //Mỗi user khi login đều đã có 2 key là privateKey và publicKey
+    // privateKey là key scret của AccessToken
+    const userRepository = getCustomRepository(UsersRepository);
 
-  public static logout = async (keystore) => {};
+    const foundUser = await findByUsername({ usr_name });
+    if (!foundUser) return { status: "-1", message: "Tài khoản của bạn không chưa chính xác, vui lòng thử lại!" };
+
+    const match = await bcrypt.compare(usr_pass, foundUser.usr_pass);
+
+    //lock account
+    if (!match && foundUser.usr_lock_count === 5) {
+      await userRepository.update({ usr_id: foundUser.usr_id }, { usr_blocked: true, usr_lock_time: new Date() });
+
+      return { status: "-1", message: "Account Has Blocked" };
+    }
+
+    if (!match) return { status: "-1", message: "login failed" };
+
+    const {
+      keyUser: { publicKey, privateKey },
+    } = await KeyTokenService.getKeyStoreByUserId({ usr_id: foundUser.usr_id });
+
+    const tokens = await createTokenPair(
+      { userId: foundUser.usr_id, usr_name: foundUser.usr_name },
+      publicKey,
+      privateKey
+    );
+
+    return {
+      status: "1",
+      user: _.omit(foundUser, ["usr_pass"]),
+      tokens,
+    };
+  };
 
   public static signUp = async ({ usr_name, usr_email, password, roles }: any) => {
     //1. Check account exits
@@ -100,6 +133,7 @@ class AuthService {
     };
   };
 
+  public static logout = async (keystore) => {};
   public static changePass = async ({ email, password }, userId) => {};
 }
 

@@ -64,12 +64,16 @@ export class Users {
   public usr_phone!: string;
 
   @Field()
+  @Column({ type: "bit", nullable: true, default: false })
+  public usr_blocked?: boolean;
+
+  @Field()
   @Column({ type: "int", nullable: true })
   public usr_lock_count!: number;
 
   @Field()
   @Column({ type: "datetime", nullable: true })
-  public usr_lock_time!: string;
+  public usr_lock_time!: Date;
 
   @Field()
   @Column({ type: "int", nullable: true })

@@ -29,10 +29,11 @@ type Users {
   updatedAt: DateTime!
   usr_address: String!
   usr_age: Float!
+  usr_blocked: Boolean!
   usr_email: String!
   usr_id: Float!
   usr_lock_count: Float!
-  usr_lock_time: String!
+  usr_lock_time: DateTime!
   usr_migration: Float!
   usr_name: String!
   usr_pass: String!
