@@ -1,5 +1,6 @@
 import APIError from "../apps/global/response/apierror";
-import auth from "./auth/index";
+import auth from "./auth";
+import products from "./products";
 
 function route(app) {
   app.use(
@@ -8,6 +9,13 @@ function route(app) {
       next();
     },
     auth
+  );
+  app.use(
+    "/v1/api",
+    function (req, res, next) {
+      next();
+    },
+    products
   );
   app.use((req, res, next) => {
     const error = new APIError("Not Found", 1237, 404);

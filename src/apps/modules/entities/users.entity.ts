@@ -64,7 +64,7 @@ export class Users {
   public usr_phone!: string;
 
   @Field()
-  @Column({ type: "bit", nullable: true, default: false })
+  @Column({ type: "bit", nullable: true })
   public usr_blocked?: boolean;
 
   @Field()

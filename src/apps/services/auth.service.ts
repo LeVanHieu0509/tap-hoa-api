@@ -1,11 +1,13 @@
+import bcrypt from "bcrypt";
+import _ from "lodash";
+import crypto from "node:crypto";
 import { getCustomRepository } from "typeorm";
+import { AuthFailureError, BadRequestError, NotFoundError } from "../../core/error.response";
+import { verifyJwt } from "../../utils/auth";
+import { HEADER, createTokenPair } from "../auth/authUtils";
 import User from "../modules/entities/users.entity";
 import { UsersRepository } from "../repositories/users.repository";
-import bcrypt from "bcrypt";
-import crypto from "node:crypto";
 import KeyTokenService from "./keyToken.service";
-import { createTokenPair } from "../auth/authUtils";
-import _ from "lodash";
 import { findByUsername } from "./user.service";
 
 const RoleUser = {
@@ -56,15 +58,9 @@ class AuthService {
 
     if (!match) return { status: "-1", message: "login failed" };
 
-    const {
-      keyUser: { publicKey, privateKey },
-    } = await KeyTokenService.getKeyStoreByUserId({ usr_id: foundUser.usr_id });
+    const { publicKey, privateKey } = await KeyTokenService.getKeyStoreByUserId({ usr_id: foundUser.usr_id });
 
-    const tokens = await createTokenPair(
-      { userId: foundUser.usr_id, usr_name: foundUser.usr_name },
-      publicKey,
-      privateKey
-    );
+    const tokens = await createTokenPair({ usr_id: foundUser.usr_id }, publicKey, privateKey);
 
     return {
       status: "1",
@@ -119,10 +115,9 @@ class AuthService {
     const tokens = await createTokenPair(
       {
         usr_id: newUser.usr_id,
-        usr_email: newUser.usr_email,
       },
-      privateKey,
-      publicKey
+      publicKey,
+      privateKey
     );
 
     return {
@@ -133,7 +128,36 @@ class AuthService {
     };
   };
 
-  public static logout = async (keystore) => {};
+  public static logout = async () => {};
+
+  public static refreshToken = async (req, res, next) => {
+    const {
+      body: { refreshToken },
+    } = req;
+
+    const userId = req.headers[HEADER.CLIENT_ID];
+
+    if (!refreshToken) throw new BadRequestError("refreshToken Not Found");
+    if (!userId) throw new AuthFailureError("Invalid Request");
+
+    const keyToken = await KeyTokenService.getKeyStoreByUserId({ usr_id: userId });
+    if (!keyToken) throw new NotFoundError("Not Found KeyToken");
+
+    const decodeUser = verifyJwt(refreshToken, keyToken.privateKey);
+
+    if (Number(userId) !== decodeUser.usr_id) throw new AuthFailureError("Invalid User ID");
+
+    const tokens = await createTokenPair(
+      {
+        usr_id: decodeUser.usr_id,
+      },
+      keyToken?.publicKey,
+      keyToken.privateKey
+    );
+
+    return { tokens };
+  };
+
   public static changePass = async ({ email, password }, userId) => {};
 }
 

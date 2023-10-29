@@ -1,7 +1,6 @@
-import { Response, Request, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 import { CREATED, SuccessResponse } from "../../core/success.response";
-import UserService from "../services/auth.service";
-import AuthService from "../services/auth.service";
+import { default as AuthService, default as UserService } from "../services/auth.service";
 
 interface RequestCustom extends Request {
   keyStore: any;
@@ -22,16 +21,21 @@ class AuthController {
     }
   };
 
-  public static refreshToken = async (req: RequestCustom, res: Response, next: NextFunction) => {};
+  public static refreshToken = async (req: RequestCustom, res: Response, next: NextFunction) => {
+    new SuccessResponse({
+      message: "refreshToken Process!",
+      metadata: await AuthService.refreshToken(req, res, next),
+      // options: {
+      //   limit: 10,
+      // },
+    }).send(res);
+  };
 
   public static login = async (req: RequestCustom, res: Response, next: NextFunction) => {
     try {
       new SuccessResponse({
         message: "Login Process!",
         metadata: await AuthService.login(req.body),
-        // options: {
-        //   limit: 10,
-        // },
       }).send(res);
     } catch (error) {
       next(error);
@@ -45,9 +49,6 @@ class AuthController {
       new CREATED({
         message: "SignUp Process!",
         metadata: await AuthService.signUp(req.body),
-        // options: {
-        //   limit: 10,
-        // },
       }).send(res);
     } catch (error) {
       next(error);

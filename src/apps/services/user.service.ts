@@ -12,4 +12,9 @@ const findByUsername = async ({
   return await userRepository.findOne({ usr_name });
 };
 
-export { findByUsername };
+const findUserById = async ({ usr_id }: { usr_id: number }) => {
+  const userRepository = getCustomRepository(UsersRepository);
+  return await userRepository.findOne({ usr_id });
+};
+
+export { findByUsername, findUserById };

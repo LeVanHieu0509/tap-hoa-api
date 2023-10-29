@@ -37,11 +37,9 @@ class KeyTokenService {
 
   public static getKeyStoreByUserId = async ({ usr_id }) => {
     const keysRepository = getCustomRepository(KeysRepository);
-    const keyUser = await keysRepository.findOne({ usr_id });
+    const keyToken = await keysRepository.findOne({ usr_id });
 
-    return {
-      keyUser,
-    };
+    return keyToken;
   };
 }
 
