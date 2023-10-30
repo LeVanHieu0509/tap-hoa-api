@@ -2,13 +2,14 @@ import bcrypt from "bcrypt";
 import _ from "lodash";
 import crypto from "node:crypto";
 import { getCustomRepository } from "typeorm";
-import { AuthFailureError, BadRequestError, NotFoundError } from "../../core/error.response";
-import { verifyJwt } from "../../utils/auth";
+import { AuthFailureError, BadRequestError, InternalServer, NotFoundError } from "../../core/error.response";
+import { verifyJwt, verifyRefreshToken } from "../../utils/auth";
 import { HEADER, createTokenPair } from "../auth/authUtils";
 import User from "../modules/entities/users.entity";
 import { UsersRepository } from "../repositories/users.repository";
 import KeyTokenService from "./keyToken.service";
 import { findByUsername } from "./user.service";
+import client from "../../dbs/init.redis";
 
 const RoleUser = {
   USER: "USER",
@@ -107,7 +108,7 @@ class AuthService {
     if (!keyStore) {
       return {
         message: "KeyStore error",
-        status: "404",
+        status: "-1",
       };
     }
 
@@ -128,7 +129,31 @@ class AuthService {
     };
   };
 
-  public static logout = async () => {};
+  public static logout = async ({ refreshToken, userId }) => {
+    if (!refreshToken) throw new AuthFailureError("Resfresh Token Not Found");
+
+    const keyToken = await KeyTokenService.getKeyStoreByUserId({ usr_id: userId });
+    if (!keyToken) throw new NotFoundError("Not Found KeyToken");
+
+    const decodeData: any = await verifyRefreshToken(refreshToken, keyToken.privateKey);
+
+    return new Promise((resolve, reject) => {
+      client.del(decodeData.usr_id.toString(), (err, reply) => {
+        if (err) reject(err);
+        if (reply == 1) {
+          resolve({
+            status: "1",
+            message: "logout success",
+          });
+        } else {
+          resolve({
+            status: "-1",
+            message: "logout failed",
+          });
+        }
+      });
+    });
+  };
 
   public static refreshToken = async (req, res, next) => {
     const {
@@ -143,7 +168,7 @@ class AuthService {
     const keyToken = await KeyTokenService.getKeyStoreByUserId({ usr_id: userId });
     if (!keyToken) throw new NotFoundError("Not Found KeyToken");
 
-    const decodeUser = verifyJwt(refreshToken, keyToken.privateKey);
+    const decodeUser: any = await verifyRefreshToken(refreshToken, keyToken.privateKey);
 
     if (Number(userId) !== decodeUser.usr_id) throw new AuthFailureError("Invalid User ID");
 

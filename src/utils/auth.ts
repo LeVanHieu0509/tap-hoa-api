@@ -1,8 +1,10 @@
 import * as jwt from "jsonwebtoken";
 import errorHandler from "./error";
+import client from "../dbs/init.redis";
+import { AuthFailureError } from "../core/error.response";
 
 export const signJwt = (payload, key, options) => {
-  return jwt.sign(payload, key || "e1ab3176-c260-4856-8e47-96a4b8e816a5", {
+  return jwt.sign(payload, key, {
     ...(options && options),
     algorithm: "HS256",
   });
@@ -18,12 +20,46 @@ export const verifyJwt = (token, key) => {
   }
 };
 
-export const verifyRefreshToken = (token, key, next) => {
-  try {
-    const decode: { usr_id: any } = jwt.verify(token, key);
+export const verifyRefreshToken = (token, key) => {
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, key, (err, payload) => {
+      if (err) {
+        reject(err);
+      } else
+        client.get(payload.usr_id.toString(), (err, reply) => {
+          if (err) {
+            return reject(err);
+          }
+          if (reply == token) {
+            return resolve(payload);
+          }
+          return reject(new AuthFailureError("Unauthorized"));
+        });
+    });
+  });
+};
 
-    return decode;
-  } catch (error) {
-    errorHandler(error);
-  }
+export const signRefreshToken = (payload, key, options) => {
+  return new Promise((resolve, reject) => {
+    jwt.sign(
+      payload,
+      key,
+      {
+        ...(options && options),
+        algorithm: "HS256",
+      },
+      (err, token) => {
+        if (err) {
+          reject(err);
+        } else
+          client.set(payload.usr_id.toString(), token, "EX", 365 * 24 * 60 * 60, (err, reply) => {
+            if (err) {
+              return reject(err);
+            }
+          });
+
+        resolve(token);
+      }
+    );
+  });
 };

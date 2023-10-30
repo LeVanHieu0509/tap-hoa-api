@@ -12,7 +12,6 @@ import { ApolloServer } from "apollo-server-express";
 import { GraphQLError, GraphQLFormattedError } from "graphql";
 //nằm ở đây và chiếm bộ nhớ. có thể gây ra conflict khi đặt.
 import buildSchema from "./apps/modules/graphql/schema";
-import redis from "./dbs/init.redis";
 
 dotenv.config();
 
@@ -36,9 +35,9 @@ const bootstrap = async () => {
       credentials: true,
       origin: [/localhost*/],
     };
+
     require("./dbs/init.my-sql");
     require("./dbs/init.redis");
-    redis.get({ key: "hieu" });
 
     route(app);
 

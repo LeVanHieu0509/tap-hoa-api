@@ -22,13 +22,14 @@ class AuthController {
   };
 
   public static refreshToken = async (req: RequestCustom, res: Response, next: NextFunction) => {
-    new SuccessResponse({
-      message: "refreshToken Process!",
-      metadata: await AuthService.refreshToken(req, res, next),
-      // options: {
-      //   limit: 10,
-      // },
-    }).send(res);
+    try {
+      new SuccessResponse({
+        message: "refreshToken Process!",
+        metadata: await AuthService.refreshToken(req, res, next),
+      }).send(res);
+    } catch (error) {
+      next(error);
+    }
   };
 
   public static login = async (req: RequestCustom, res: Response, next: NextFunction) => {
@@ -42,7 +43,16 @@ class AuthController {
     }
   };
 
-  public static logout = async (req: RequestCustom, res: Response, next: NextFunction) => {};
+  public static logout = async (req: RequestCustom, res: Response, next: NextFunction) => {
+    try {
+      new SuccessResponse({
+        message: "Logout Process!",
+        metadata: await AuthService.logout(req.body),
+      }).send(res);
+    } catch (error) {
+      next(error);
+    }
+  };
 
   public static signUp = async (req: RequestCustom, res: Response, next: NextFunction) => {
     try {

@@ -3,6 +3,7 @@ const StatusCode = {
   CONFLICT: 409,
   UNAUTHORIZED: 401,
   NOT_FOUND: 404,
+  INTERNAL_SERVER: 500,
 };
 
 const ReasonStatusCode = {
@@ -10,6 +11,7 @@ const ReasonStatusCode = {
   CONFLICT: "conflict error",
   UNAUTHORIZED: "unauthorized",
   NOT_FOUND: "not found",
+  INTERNAL_SERVER: "Internal Server",
 };
 
 class ErrorResponse extends Error {
@@ -51,4 +53,10 @@ class Forbidden extends ErrorResponse {
   }
 }
 
-export { ConflictRequestError, BadRequestError, AuthFailureError, NotFoundError, Forbidden };
+class InternalServer extends ErrorResponse {
+  constructor(message = ReasonStatusCode.INTERNAL_SERVER, statusCode = StatusCode.INTERNAL_SERVER) {
+    super(message, statusCode);
+  }
+}
+
+export { ConflictRequestError, BadRequestError, AuthFailureError, NotFoundError, Forbidden, InternalServer };

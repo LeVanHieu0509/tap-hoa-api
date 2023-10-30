@@ -1,5 +1,5 @@
 import { NextFunction } from "express";
-import { signJwt, verifyJwt } from "../../utils/auth";
+import { signJwt, signRefreshToken, verifyJwt } from "../../utils/auth";
 import { asyncHandler } from "../../helpers/asyncHandler";
 import { AuthFailureError, NotFoundError } from "../../core/error.response";
 import KeyTokenService from "../services/keyToken.service";
@@ -22,7 +22,7 @@ export const createTokenPair = async (payload, publicKey, privateKey) => {
       expiresIn: "2d",
     });
 
-    const refreshToken = signJwt(payload, privateKey, {
+    const refreshToken = await signRefreshToken(payload, privateKey, {
       expiresIn: "1y",
     });
 
