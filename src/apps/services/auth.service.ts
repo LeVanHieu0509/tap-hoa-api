@@ -130,6 +130,9 @@ class AuthService {
   };
 
   public static logout = async ({ refreshToken, userId }) => {
+    // Có tài khoản?
+    // Có refreshToken?
+
     if (!refreshToken) throw new AuthFailureError("Resfresh Token Not Found");
 
     const keyToken = await KeyTokenService.getKeyStoreByUserId({ usr_id: userId });
