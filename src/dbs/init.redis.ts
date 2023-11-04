@@ -6,12 +6,17 @@ dotenv.config();
 let client: any;
 
 (async () => {
+  // client = createClient({
+  //   password: process.env.PASS_WORD_REDIS,
+  //   socket: {
+  //     host: process.env.HOST_REDIS,
+  //     port: +process.env.PORT_REDIS,
+  //   },
+  //   legacyMode: true,
+  // });
+
   client = createClient({
-    password: process.env.PASS_WORD_REDIS,
-    socket: {
-      host: process.env.HOST_REDIS,
-      port: +process.env.PORT_REDIS,
-    },
+    url: process.env.HOST_REDIS_URI,
     legacyMode: true,
   });
 

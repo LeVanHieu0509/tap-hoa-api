@@ -13,14 +13,16 @@ module.exports = {
   extra: {
     charset: "utf8mb4",
   },
+  // connectionLimit: 8,
   // options: {
-  //     encrypt: false,
-  //     useUTC: true,
+  //   encrypt: false,
+  //   useUTC: true,
   // },
+
   // maxPoolSize: 90, // đặt giới hạn số kết nối trong pool
   // pool: {
-  //     max: 100,
-  //     min: 0,
-  //     idleTimeoutMillis: 3600000,
+  //   max: 100,
+  //   min: 0,
+  //   idleTimeoutMillis: 3600000,
   // },
 };
