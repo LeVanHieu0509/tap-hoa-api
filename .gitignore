@@ -6,7 +6,7 @@ docker-compose.override.yml
 /out-tsc
 /server/build
 /src/*.js
-.env
+
 .DS_Store
 *js.map
 # dependencies
@@ -40,7 +40,7 @@ testem.log
 .DS_Store
 Thumbs.db
 #env
-.env
+
 .test.env
 /dist
 .nyc_output
