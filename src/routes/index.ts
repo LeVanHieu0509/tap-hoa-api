@@ -1,6 +1,7 @@
 import APIError from "../apps/global/response/apierror";
 import auth from "./auth";
 import products from "./products";
+import pdf from "./pdf";
 
 function route(app) {
   app.use(
@@ -16,6 +17,13 @@ function route(app) {
       next();
     },
     products
+  );
+  app.use(
+    "/v1/api",
+    function (req, res, next) {
+      next();
+    },
+    pdf
   );
   app.use((req, res, next) => {
     const error = new APIError("Not Found", 1237, 404);
