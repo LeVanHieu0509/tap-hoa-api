@@ -1,8 +1,7 @@
-git pull
 yarn
 yarn build
 
 pm2 startup systemd
-pm2 start "yarn start"
-pm2 save
 pm2 status
+pm2 start "yarn start" --name angels
+pm2 save
