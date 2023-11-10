@@ -1,3 +1,6 @@
+pm2 pm2 delete angels
+pm2 save
+
 git pull
 yarn
 yarn build
