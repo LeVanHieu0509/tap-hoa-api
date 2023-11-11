@@ -4,6 +4,10 @@ import { asyncHandler } from "../../helpers/asyncHandler";
 
 const router = require("express").Router();
 
-router.get("/user/get-products", authentication, asyncHandler(ProductsController.getProducts));
+router.post("/get-product", authentication, asyncHandler(ProductsController.getProduct));
+router.post("/get-products", authentication, asyncHandler(ProductsController.getProducts));
+router.post("/create-product", authentication, asyncHandler(ProductsController.createProduct));
+router.post("/delete-product", authentication, asyncHandler(ProductsController.deleteProduct));
+router.post("/update-product", authentication, asyncHandler(ProductsController.updateProduct));
 
 export default router;

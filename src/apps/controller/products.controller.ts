@@ -1,22 +1,49 @@
 import { NextFunction, Request, Response } from "express";
 import { SuccessResponse } from "../../core/success.response";
-import { findProducts } from "../services/products.service";
+import {
+  createProduct,
+  deleteProduct,
+  getProduct,
+  getProducts,
+  updateProduct,
+} from "../services/product/products.service";
 
 class ProductsController {
-  constructor(parameters) {}
-
-  public static getProducts = async (req: Request, res: Response, next: NextFunction) => {
+  public static getProduct = async (req: Request, res: Response, next: NextFunction) => {
     return new SuccessResponse({
-      metadata: await findProducts(req.body),
+      metadata: await getProduct(req.body),
       statusCode: 200,
-      message: "Products Process",
+      message: "Process Get Product",
     }).send(res);
   };
 
-  public static getProduct = async (req: Request, res: Response, next: NextFunction) => {};
-  public static createProduct = (req: Request, res: Response, next: NextFunction) => {};
-  public static deleteProduct = (req: Request, res: Response, next: NextFunction) => {};
-  public static updateProduct = (req: Request, res: Response, next: NextFunction) => {};
+  public static getProducts = async (req: Request, res: Response, next: NextFunction) => {
+    return new SuccessResponse({
+      metadata: await getProducts(req.body),
+      statusCode: 200,
+      message: "Process Get Products",
+    }).send(res);
+  };
+
+  public static createProduct = async (req: Request, res: Response, next: NextFunction) => {
+    new SuccessResponse({
+      message: "Process Create Product!",
+      metadata: await createProduct(req.body),
+    }).send(res);
+  };
+
+  public static deleteProduct = async (req: Request, res: Response, next: NextFunction) => {
+    new SuccessResponse({
+      message: "Process Delete Product!",
+      metadata: await deleteProduct(req.body),
+    }).send(res);
+  };
+  public static updateProduct = async (req: Request, res: Response, next: NextFunction) => {
+    new SuccessResponse({
+      message: "Process Update Product!",
+      metadata: await updateProduct(req.body),
+    }).send(res);
+  };
 
   public static getSearchProducts = (req: Request, res: Response, next: NextFunction) => {};
   public static publicProduct = (req: Request, res: Response, next: NextFunction) => {};
