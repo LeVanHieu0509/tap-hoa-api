@@ -14,6 +14,7 @@ import client from "../../dbs/init.redis";
 const RoleUser = {
   USER: "USER",
   ADMIN: "ADMIN",
+  EMPLOYEE: "EMPLOYEE",
 };
 
 class AuthService {
@@ -89,7 +90,7 @@ class AuthService {
       usr_name: usr_name,
       usr_pass: passwordHash,
       usr_email: usr_email,
-      usr_roles: JSON.stringify([RoleUser.USER]),
+      usr_roles: RoleUser.EMPLOYEE,
     });
 
     await userRepository.save(newUser);

@@ -11,6 +11,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { Keys } from "./keys.entity";
+import { Carts } from "./carts.entity";
 
 @ObjectType()
 @Entity({
@@ -94,5 +95,9 @@ export class Users {
   @Field((_type) => [Keys])
   @OneToMany((_type) => Keys, (key: Keys) => key.usr_id)
   public keys!: Keys[];
+
+  @Field((_type) => [Carts])
+  @OneToMany((_type) => Carts, (key: Carts) => key.usr_id)
+  public cart!: Carts[];
 }
 export default Users;

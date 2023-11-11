@@ -9,10 +9,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import Categories from "./categories";
+import Inventories from "./inventory.entity";
 
 @ObjectType()
 class SlugtifiedProductName {
@@ -99,6 +101,10 @@ export class Products {
   })
   @JoinColumn({ name: "category_id" })
   public categories!: Categories;
+
+  @Field((_type) => [Inventories])
+  @OneToMany((_type) => Inventories, (inventories: Inventories) => inventories.products)
+  public inventories!: Inventories[];
 }
 
 export default Products;

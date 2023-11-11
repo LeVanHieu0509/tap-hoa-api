@@ -2,6 +2,7 @@ import APIError from "../apps/global/response/apierror";
 import auth from "./auth";
 import products from "./products";
 import pdf from "./pdf";
+import carts from "./carts";
 
 function route(app) {
   app.use(
@@ -26,6 +27,14 @@ function route(app) {
       next();
     },
     products
+  );
+
+  app.use(
+    "/v1/api/carts",
+    function (req, res, next) {
+      next();
+    },
+    carts
   );
 
   app.use((req, res, next) => {

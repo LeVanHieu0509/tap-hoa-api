@@ -9,6 +9,7 @@ export const HEADER = {
   API_KEY: "user-api-key",
   CLIENT_ID: "user-client-id",
   AUTHORIZATION: "authorization",
+  ROLES: "roles",
 };
 
 export interface RequestCustom extends Request {

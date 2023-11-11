@@ -3,6 +3,16 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
+type Carts {
+  cart_count_product: String!
+  cart_products: String!
+  cart_state: String!
+  createdAt: DateTime!
+  id: Float!
+  updatedAt: DateTime!
+  usr_id: Users!
+}
+
 """
 The javascript `Date` as string. Type represents date and time as the ISO Date string.
 """
@@ -24,6 +34,7 @@ type Query {
 }
 
 type Users {
+  cart: [Carts!]!
   createdAt: DateTime!
   keys: [Keys!]!
   updatedAt: DateTime!
