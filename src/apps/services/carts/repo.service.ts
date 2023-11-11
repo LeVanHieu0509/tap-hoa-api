@@ -14,11 +14,11 @@ export const findCartByUser = async ({ usr_id }) => {
 export const findCartById = async ({ id }) => {
   const cartRepository = getCustomRepository(CartsRepository);
 
-  const userCart = await cartRepository.findOne({
+  const foundCart = await cartRepository.findOne({
     id,
   });
 
-  return userCart;
+  return foundCart;
 };
 
 export const findAllCarts = async ({ limit, sortOrder, sortBy, page, filter, select = [] }: any) => {

@@ -12,6 +12,7 @@ import Products from "../../modules/entities/product.entity";
 import { ProductsRepository } from "../../repositories/products.reposiotory";
 import { getCrawlProduct } from "./helper.service";
 import { findAllProducts, getProductByCode } from "./repo.service";
+import { insertInventory } from "../inventories/inventories.service";
 
 export const getProduct = async ({ product_code }) => {
   const foundProduct = await getProductByCode({ product_code });
@@ -52,6 +53,12 @@ export const createProduct = async (data: Products) => {
       }
     );
     if (result.affected == 1) {
+      await insertInventory({
+        product_code: foundProduct.id,
+        stock: (await foundProduct).product_quantity + product_quantity,
+        location: "",
+      });
+
       return {
         status: "1",
         message: MESSAGE_UPDATE_SUCCESS,
@@ -73,6 +80,12 @@ export const createProduct = async (data: Products) => {
     const newProduct = await productRepository.save(product);
 
     if (newProduct) {
+      await insertInventory({
+        product_code: newProduct.id,
+        stock: product_quantity,
+        location: "",
+      });
+
       return {
         status: "1",
         message: MESSAGE_ADD_SUCCESS,

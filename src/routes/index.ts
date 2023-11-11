@@ -3,6 +3,7 @@ import auth from "./auth";
 import products from "./products";
 import pdf from "./pdf";
 import carts from "./carts";
+import checkout from "./checkout";
 
 function route(app) {
   app.use(
@@ -35,6 +36,14 @@ function route(app) {
       next();
     },
     carts
+  );
+
+  app.use(
+    "/v1/api/checkout",
+    function (req, res, next) {
+      next();
+    },
+    checkout
   );
 
   app.use((req, res, next) => {
