@@ -12,7 +12,7 @@ import Products from "../../modules/entities/product.entity";
 import { ProductsRepository } from "../../repositories/products.reposiotory";
 import { getCrawlProduct } from "./helper.service";
 import { findAllProducts, getProductByCode } from "./repo.service";
-import { customAlphabet, nanoid } from "nanoid";
+import { customAlphabet } from "nanoid";
 
 function generateId(): string {
   // String include number and uppercase character
