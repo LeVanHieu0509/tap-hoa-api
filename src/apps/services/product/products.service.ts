@@ -12,32 +12,46 @@ import Products from "../../modules/entities/product.entity";
 import { ProductsRepository } from "../../repositories/products.reposiotory";
 import { getCrawlProduct } from "./helper.service";
 import { findAllProducts, getProductByCode } from "./repo.service";
-import { insertInventory } from "../inventories/inventories.service";
+import { customAlphabet, nanoid } from "nanoid";
 
-export const getProduct = async ({ product_code }) => {
-  const foundProduct = await getProductByCode({ product_code });
+function generateId(): string {
+  // String include number and uppercase character
+  const generateId = customAlphabet("0123456789", 5);
+  return generateId();
+}
 
-  return {
-    status: "1",
-    data: foundProduct ?? {},
-  };
+export const getProduct = async (data) => {
+  const { product_code, product_bar_code } = data ?? {};
+  if (product_code || product_bar_code) {
+    const foundProduct = await getProductByCode(data);
+
+    return {
+      status: "1",
+      data: foundProduct ?? {},
+    };
+  }
 };
 
 export const createProduct = async (data: Products) => {
-  const {
+  let {
     product_name,
     product_image_url,
     product_code,
+    product_bar_code,
     product_quantity,
     product_manufacture_date,
     product_expired_date,
     categories,
   } = data ?? {};
 
+  if (!product_code) {
+    product_code = generateId();
+  }
+
   const productRepository = getCustomRepository(ProductsRepository);
   const foundProduct = await getProductByCode({ product_code });
 
-  const resCrawlProduct = await getCrawlProduct({ product_code });
+  const resCrawlProduct = await getCrawlProduct({ product_bar_code });
   const dataProduct = resCrawlProduct.data.items;
 
   //check exits san pham
@@ -53,11 +67,11 @@ export const createProduct = async (data: Products) => {
       }
     );
     if (result.affected == 1) {
-      await insertInventory({
-        product_code: foundProduct.id,
-        stock: (await foundProduct).product_quantity + product_quantity,
-        location: "",
-      });
+      // await insertInventory({
+      //   product_code: foundProduct.id,
+      //   stock: (await foundProduct).product_quantity + product_quantity,
+      //   location: "",
+      // });
 
       return {
         status: "1",
@@ -80,11 +94,11 @@ export const createProduct = async (data: Products) => {
     const newProduct = await productRepository.save(product);
 
     if (newProduct) {
-      await insertInventory({
-        product_code: newProduct.id,
-        stock: product_quantity,
-        location: "",
-      });
+      // await insertInventory({
+      //   product_code: newProduct.id,
+      //   stock: product_quantity,
+      //   location: "",
+      // });
 
       return {
         status: "1",
@@ -110,6 +124,8 @@ export const getProducts = async ({
   priceMax,
   filter = { isPublished: true },
   select = [
+    "id",
+    "product_bar_code",
     "product_code",
     "product_name",
     "product_description",

@@ -31,8 +31,12 @@ export class Products {
   public readonly id!: number;
 
   @Field()
-  @Column({ type: "varchar", nullable: true })
+  @Column({ type: "varchar", nullable: true, unique: true })
   public product_code!: string;
+
+  @Field()
+  @Column({ type: "varchar", nullable: true, unique: true })
+  public product_bar_code!: string;
 
   @Field()
   @Column({ type: "nvarchar", nullable: true })
@@ -62,7 +66,7 @@ export class Products {
   @BeforeUpdate()
   async slugtifyProductName() {
     // slugify from product name
-    this.product_slug = slugify(this.product_name, { lower: true });
+    this.product_slug = this.product_name ? slugify(this.product_name, { lower: true }) : null;
   }
 
   @Field()

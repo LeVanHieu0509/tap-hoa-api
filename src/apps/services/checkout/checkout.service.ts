@@ -10,7 +10,7 @@ export const checkoutReview = async (req) => {
   const { id } = req.body;
 
   const foundCarts = await findCartById({ id });
-  if (!foundCarts) throw new BadRequestError("Cart does not exists!");
+  if (!foundCarts) throw new BadRequestError("Không tìm thấy carts nào!");
 
   const checkout_order = {
     totalQuantity: 0, // tong tien hang
@@ -54,7 +54,8 @@ export const orderByUser = async (req) => {
 
   const foundCarts = await findCartById({ id: id });
 
-  if (!foundCarts) throw new BadRequestError("Cart does not exists!");
+  if (!foundCarts) throw new BadRequestError("Không tìm thấy cart nào!");
+
   if (foundCarts.cart_state !== "active") throw new BadRequestError("Bạn đã xác nhận đơn này rồi, vui lòng thử lại!");
 
   const cartProducts = JSON.parse(foundCarts.cart_products);
