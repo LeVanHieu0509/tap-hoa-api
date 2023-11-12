@@ -2,6 +2,8 @@ pm2 pm2 delete angels
 pm2 save
 
 git pull
+LeVanHieu0509
+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
 yarn
 yarn build
 
