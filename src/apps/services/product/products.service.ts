@@ -1,18 +1,24 @@
 import { get, head } from "lodash";
+import { customAlphabet } from "nanoid";
 import { getCustomRepository } from "typeorm";
+import { isCheckHasValue, responseClient } from "../../../utils";
 import {
   MESSAGE_ADD_FAILED,
   MESSAGE_ADD_SUCCESS,
   MESSAGE_DELETE_FAILED,
   MESSAGE_DELETE_SUCCESS,
+  MESSAGE_GET_SUCCESS,
   MESSAGE_NOTFOUND,
+  MESSAGE_PRODUCT_CODE_CONFLICT,
+  MESSAGE_SUCCESS,
+  MESSAGE_UPDATE_FAILED,
   MESSAGE_UPDATE_SUCCESS,
 } from "../../constants";
 import Products from "../../modules/entities/product.entity";
 import { ProductsRepository } from "../../repositories/products.reposiotory";
 import { getCrawlProduct } from "./helper.service";
-import { findAllProducts, getProductByCode } from "./repo.service";
-import { customAlphabet } from "nanoid";
+import { findAllProducts, getProductByProductBarCode, getProductByProductCode } from "./repo.service";
+import { BadRequestError } from "../../../core/error.response";
 
 function generateId(): string {
   // String include number and uppercase character
@@ -22,17 +28,52 @@ function generateId(): string {
 
 export const getProduct = async (data) => {
   const { product_code, product_bar_code } = data ?? {};
-  if (product_code || product_bar_code) {
-    const foundProduct = await getProductByCode(data);
 
-    return {
+  if (product_code) {
+    const foundProduct = await getProductByProductCode({ product_code });
+
+    return responseClient({
       status: "1",
       data: foundProduct ?? {},
-    };
+      message: MESSAGE_SUCCESS,
+    });
+  } else if (product_bar_code) {
+    const foundProduct = await getProductByProductBarCode({ product_bar_code });
+
+    return responseClient({
+      status: "1",
+      data: foundProduct ?? {},
+      message: MESSAGE_SUCCESS,
+    });
+  } else {
+    return responseClient({
+      status: "-1",
+      message: MESSAGE_NOTFOUND,
+    });
   }
 };
 
 export const createProduct = async (data: Products) => {
+  //case: nhân viên sẽ quét mã vạch
+  //1. Filed vào ô product_bar_code ==> có
+  //2. Gen auto ra product_code ==> có (nếu null thì gen ra)
+  // Lưu 2 mã product_code product_bar_code vào.
+
+  //case: nhân viên ko quét mã vạch mà họ nhập Mã code_product.
+  //1. Filed vào ô product_bar_code => không
+  //2. Mã product_code được nhập từ nhân viên => buộc nhập
+  // Lưu 1 product_code mã vào.
+
+  //1. Buộc phải có product_code (Nếu không có thì phải thì phải tự gen ra rồi mới lưu vào db)
+  //2. Case1: User nhập product_bar_code và nhập product_code
+  //3. Case2: User nhập product_bar_code và ko nhập product_code
+  //4. Case3: User nhập product_code và ko nhập product_bar_code
+  //5. Áp dụng cho thêm và update sản phẩm
+  //6. Trường hợp thêm:
+  // - Tìm product => ko có => Tạo mới
+  // - Có => update
+  //7. Trường hợp update thì chỉ update số lượng mới cộng vào số lượng cũ, và đổi ngày hết hạn.
+
   let {
     product_name,
     product_image_url,
@@ -44,73 +85,79 @@ export const createProduct = async (data: Products) => {
     categories,
   } = data ?? {};
 
-  if (!product_code) {
-    product_code = generateId();
+  let foundProduct: Products;
+  let dataCrawlProduct;
+  const productRepository = getCustomRepository(ProductsRepository);
+
+  if (isCheckHasValue(product_bar_code) && isCheckHasValue(product_code)) {
+    foundProduct = await getProductByProductBarCode({ product_bar_code });
+  } else if (isCheckHasValue(product_bar_code) && !isCheckHasValue(product_code)) {
+    foundProduct = await getProductByProductBarCode({ product_bar_code });
+
+    //set product code auto when only product code bar
+    if (!foundProduct) {
+      product_code = generateId();
+    } else {
+      product_code = foundProduct.product_code;
+    }
+  } else if (isCheckHasValue(product_code) && !isCheckHasValue(product_bar_code)) {
+    foundProduct = await getProductByProductCode({ product_code });
+  } else {
+    throw new BadRequestError("Vui lòng nhập Mã code hoặc mã vạch");
   }
 
-  const productRepository = getCustomRepository(ProductsRepository);
-  const foundProduct = await getProductByCode({ product_code });
+  //Crawl API get name product
+  if (product_bar_code) {
+    const resCrawlProduct = await getCrawlProduct({ product_bar_code });
+    dataCrawlProduct = resCrawlProduct.data.items;
+  }
 
-  const resCrawlProduct = await getCrawlProduct({ product_bar_code });
-  const dataProduct = resCrawlProduct.data.items;
-
-  //check exits san pham
+  // if you find product has in store, only update product_quantity up to quantity
   if (foundProduct) {
     const result = await productRepository.update(
       {
         product_code,
       },
       {
-        product_quantity: (await foundProduct).product_quantity + product_quantity,
+        product_quantity: foundProduct.product_quantity + product_quantity,
         product_manufacture_date,
         product_expired_date,
       }
     );
-    if (result.affected == 1) {
-      // await insertInventory({
-      //   product_code: foundProduct.id,
-      //   stock: (await foundProduct).product_quantity + product_quantity,
-      //   location: "",
-      // });
 
-      return {
+    if (result.affected == 1) {
+      return responseClient({
         status: "1",
         message: MESSAGE_UPDATE_SUCCESS,
-      };
+      });
     } else {
-      return {
+      return responseClient({
         status: "-1",
-        message: MESSAGE_DELETE_FAILED,
-      };
+        message: MESSAGE_PRODUCT_CODE_CONFLICT,
+      });
     }
   } else {
     const product = productRepository.create({
       ...data,
+      product_code: product_code,
       categories: categories,
-      product_name: dataProduct ? get(head(dataProduct), "name") : product_name,
-      product_image_url: dataProduct ? get(head(dataProduct), "image_url") : product_image_url,
+      product_name: dataCrawlProduct ? get(head(dataCrawlProduct), "name") : product_name,
+      product_image_url: dataCrawlProduct ? get(head(dataCrawlProduct), "image_url") : product_image_url,
     });
 
     const newProduct = await productRepository.save(product);
 
     if (newProduct) {
-      // await insertInventory({
-      //   product_code: newProduct.id,
-      //   stock: product_quantity,
-      //   location: "",
-      // });
-
-      return {
+      return responseClient({
         status: "1",
+        data: newProduct,
         message: MESSAGE_ADD_SUCCESS,
-      };
-
-      //insert inventory
+      });
     } else {
-      return {
+      return responseClient({
         status: "-1",
         message: MESSAGE_ADD_FAILED,
-      };
+      });
     }
   }
 };
@@ -137,7 +184,7 @@ export const getProducts = async ({
     "product_expired_date",
   ],
 }: any) => {
-  return await findAllProducts({
+  const { products, total } = await findAllProducts({
     limit,
     sortOrder,
     sortBy,
@@ -147,11 +194,19 @@ export const getProducts = async ({
     priceMin,
     priceMax,
   });
+
+  return {
+    status: "1",
+    data: {
+      products,
+      total,
+    },
+  };
 };
 
 export const deleteProduct = async ({ product_code }) => {
   const productRepository = getCustomRepository(ProductsRepository);
-  const foundProduct = await getProductByCode({ product_code });
+  const foundProduct = await getProductByProductCode({ product_code });
 
   if (foundProduct) {
     const deleteKey = await productRepository.delete({ product_code });
@@ -171,7 +226,7 @@ export const deleteProduct = async ({ product_code }) => {
 export const updateProduct = async (data) => {
   const { product_code } = data ?? {};
   const productRepository = getCustomRepository(ProductsRepository);
-  const foundProduct = await getProductByCode({ product_code });
+  const foundProduct = await getProductByProductCode({ product_code });
 
   if (foundProduct) {
     const result = await productRepository.update(

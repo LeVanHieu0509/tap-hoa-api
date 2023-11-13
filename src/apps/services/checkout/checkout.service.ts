@@ -1,15 +1,16 @@
 import { getCustomRepository } from "typeorm";
 import { BadRequestError } from "../../../core/error.response";
-import { HEADER } from "../../auth/authUtils";
+import { responseClient } from "../../../utils";
+import { MESSAGE_SUCCESS } from "../../constants";
+import { CartsRepository } from "../../repositories/carts.repository";
 import { ProductsRepository } from "../../repositories/products.reposiotory";
 import { findCartById } from "../carts/repo.service";
-import { getProductByCode } from "../product/repo.service";
-import { CartsRepository } from "../../repositories/carts.repository";
+import { getProductByProductCode } from "../product/repo.service";
 
 export const checkoutReview = async (req) => {
   const { id } = req.body;
-
   const foundCarts = await findCartById({ id });
+
   if (!foundCarts) throw new BadRequestError("Không tìm thấy carts nào!");
 
   const checkout_order = {
@@ -22,8 +23,7 @@ export const checkoutReview = async (req) => {
 
   for (let i = 0; i < cartProducts.length; i++) {
     let { product_code, quantity } = cartProducts[i];
-
-    const foundProduct = await getProductByCode({ product_code });
+    const foundProduct = await getProductByProductCode({ product_code });
 
     const product = {
       id: foundProduct.id,
@@ -40,9 +40,31 @@ export const checkoutReview = async (req) => {
     newCartsProduct.push(product);
   }
   //tra ve data de xuat file pdf
+  return responseClient({
+    status: "1",
+    message: MESSAGE_SUCCESS,
+    data: {
+      cartProducts: newCartsProduct,
+      ...checkout_order,
+    },
+  });
+};
+
+const checkValidProducts = async (list) => {
+  const listOutOfStock = [];
+
+  for (let i = 0; i < list.length; i++) {
+    const { product_code, quantity } = list[i];
+    const foundProduct = getProductByProductCode({ product_code });
+
+    if ((await foundProduct).product_quantity - quantity < 0) {
+      listOutOfStock.push(product_code);
+    }
+  }
+
   return {
-    cartProducts: newCartsProduct,
-    ...checkout_order,
+    isValid: !Boolean(listOutOfStock.length),
+    listOutOfStock: listOutOfStock,
   };
 };
 
@@ -55,37 +77,45 @@ export const orderByUser = async (req) => {
   const foundCarts = await findCartById({ id: id });
 
   if (!foundCarts) throw new BadRequestError("Không tìm thấy cart nào!");
-
   if (foundCarts.cart_state !== "active") throw new BadRequestError("Bạn đã xác nhận đơn này rồi, vui lòng thử lại!");
 
   const cartProducts = JSON.parse(foundCarts.cart_products);
 
-  for (let i = 0; i < cartProducts.length; i++) {
-    const { product_code, quantity } = cartProducts[i];
+  const statusProducts = await checkValidProducts(cartProducts);
 
-    const foundProduct = getProductByCode({ product_code });
+  if (statusProducts.isValid) {
+    for (let i = 0; i < cartProducts.length; i++) {
+      const { product_code, quantity } = cartProducts[i];
+      const foundProduct = await getProductByProductCode({ product_code });
 
-    await productRepository.update(
-      {
-        product_code,
-      },
-      {
-        product_quantity: (await foundProduct).product_quantity - quantity,
-      }
-    );
+      await productRepository.update(
+        {
+          product_code,
+        },
+        {
+          product_quantity: foundProduct.product_quantity - quantity,
+        }
+      );
 
-    await cartRepository.update(
-      {
-        id,
-      },
-      {
-        cart_state: "success",
-      }
-    );
+      await cartRepository.update(
+        {
+          id,
+        },
+        {
+          cart_state: "success",
+        }
+      );
+    }
+
+    return responseClient({
+      status: "1",
+      message: "Bạn đã xác nhận đơn thành công!",
+    });
+  } else {
+    return responseClient({
+      message: "Sản phẩm bị quá số lượng, vui lòng thử lại!",
+      status: "-1",
+      data: statusProducts.listOutOfStock,
+    });
   }
-
-  return {
-    status: "1",
-    message: "Bạn đã xác nhận đơn thành công!",
-  };
 };

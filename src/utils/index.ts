@@ -1,3 +1,5 @@
+import _ from "lodash";
+
 export const resolvePromise = (resolve, reject) => {
   return (err, data) => {
     if (err) {
@@ -35,4 +37,15 @@ export const updateNestedObjectParser = (obj: any) => {
   });
 
   return final;
+};
+export const responseClient = ({ status, data, message }: { status: string | number; data?: any; message: string }) => {
+  return {
+    status,
+    data,
+    message,
+  };
+};
+
+export const isCheckHasValue = (value: string) => {
+  return typeof value == "string" ? value.length > 0 : !_.isNil(value);
 };

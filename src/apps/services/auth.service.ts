@@ -10,6 +10,8 @@ import { UsersRepository } from "../repositories/users.repository";
 import KeyTokenService from "./keyToken.service";
 import { findByUsername } from "./user.service";
 import client from "../../dbs/init.redis";
+import { MESSAGE_NOTFOUND, MESSAGE_SUCCESS } from "../constants";
+import { responseClient } from "../../utils";
 
 const RoleUser = {
   USER: "USER",
@@ -64,11 +66,14 @@ class AuthService {
 
     const tokens = await createTokenPair({ usr_id: foundUser.usr_id }, publicKey, privateKey);
 
-    return {
+    return responseClient({
       status: "1",
-      user: _.omit(foundUser, ["usr_pass"]),
-      tokens,
-    };
+      data: {
+        user: _.omit(foundUser, ["usr_pass"]),
+        tokens,
+      },
+      message: MESSAGE_SUCCESS,
+    });
   };
 
   public static signUp = async ({ usr_name, usr_email, password, roles }: any) => {
@@ -77,10 +82,10 @@ class AuthService {
     const user = await userRepository.findOne({ usr_name });
 
     if (user) {
-      return {
+      return responseClient({
         message: "Tài khoản này đã tồn tại trên hệ thống",
         status: "-1",
-      };
+      });
     }
     //2. Hash Pass
     const passwordHash = await bcrypt.hash(password, 10);
@@ -107,10 +112,10 @@ class AuthService {
     });
 
     if (!keyStore) {
-      return {
+      return responseClient({
         message: "KeyStore error",
         status: "-1",
-      };
+      });
     }
 
     //6. Sinh ra token token pair
@@ -122,12 +127,14 @@ class AuthService {
       privateKey
     );
 
-    return {
-      message: "Tạo tài khoản thành công",
+    return responseClient({
+      message: "Bạn đã tạo tài khoản thành công!",
       status: "1",
-      user: _.omit(newUser, ["usr_pass"]),
-      tokens: tokens,
-    };
+      data: {
+        user: _.omit(newUser, ["usr_pass"]),
+        tokens: tokens,
+      },
+    });
   };
 
   public static logout = async ({ refreshToken, userId }) => {
@@ -183,8 +190,21 @@ class AuthService {
       keyToken?.publicKey,
       keyToken.privateKey
     );
-
-    return { tokens };
+    if (tokens) {
+      return responseClient({
+        message: MESSAGE_SUCCESS,
+        status: "1",
+        data: {
+          accessToken: tokens.accessToken,
+          refreshToken: tokens.refreshToken,
+        },
+      });
+    } else {
+      return responseClient({
+        status: "-1",
+        message: MESSAGE_NOTFOUND,
+      });
+    }
   };
 
   public static changePass = async ({ email, password }, userId) => {};

@@ -35,7 +35,7 @@ export class Products {
   public product_code!: string;
 
   @Field()
-  @Column({ type: "varchar", nullable: true, unique: true })
+  @Column({ type: "varchar", nullable: true })
   public product_bar_code!: string;
 
   @Field()
@@ -74,11 +74,11 @@ export class Products {
   public product_quantity!: number;
 
   @Field()
-  @Column({ type: "bit", default: true, select: false })
+  @Column({ type: "smallint", default: 0, select: false })
   public is_draft!: boolean;
 
   @Field()
-  @Column({ type: "bit", default: true, select: false })
+  @Column({ type: "smallint", default: 1, select: false })
   public is_published!: boolean;
 
   @Field()

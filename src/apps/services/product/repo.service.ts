@@ -1,10 +1,16 @@
 import { getCustomRepository } from "typeorm";
 import { ProductsRepository } from "../../repositories/products.reposiotory";
 
-export const getProductByCode = async (where) => {
+export const getProductByProductCode = async ({ product_code }) => {
   const productRepository = getCustomRepository(ProductsRepository);
 
-  return await productRepository.findOne(where);
+  return await productRepository.findOne({ product_code });
+};
+
+export const getProductByProductBarCode = async ({ product_bar_code }) => {
+  const productRepository = getCustomRepository(ProductsRepository);
+
+  return await productRepository.findOne({ product_bar_code });
 };
 
 export const queryProduct = async ({ query, limit, skip }) => {

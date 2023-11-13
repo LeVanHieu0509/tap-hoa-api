@@ -20,7 +20,7 @@ class SuccessResponse {
   }
 
   send(res, headers = {}) {
-    return res.status(this.statusCode).json(this);
+    return res.status(this.statusCode).json(this.metadata);
   }
 }
 

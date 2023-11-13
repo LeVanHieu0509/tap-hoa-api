@@ -4,7 +4,7 @@
 
 import { getCustomRepository } from "typeorm";
 import { InventoriesRepository } from "../../repositories/inventories.repository";
-import { getProductByCode } from "../product/repo.service";
+import { getProductByProductCode } from "../product/repo.service";
 import { BadRequestError } from "../../../core/error.response";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import Inventories from "../../modules/entities/inventory.entity";
@@ -15,7 +15,7 @@ export const addStockToInventory = async (req) => {
 
   const inventoriesRepository = getCustomRepository(InventoriesRepository);
 
-  const product = await getProductByCode({ product_code });
+  const product = await getProductByProductCode({ product_code });
 
   if (!product) throw new BadRequestError("The product does not exists");
 
