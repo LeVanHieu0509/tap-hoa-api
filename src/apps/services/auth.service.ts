@@ -49,7 +49,8 @@ class AuthService {
     const userRepository = getCustomRepository(UsersRepository);
 
     const foundUser = await findByUsername({ usr_name });
-    if (!foundUser) return { status: "-1", message: "Tài khoản của bạn không chưa chính xác, vui lòng thử lại!" };
+    if (!foundUser)
+      return responseClient({ status: "-1", message: "Tài khoản của bạn chưa chính xác, vui lòng thử lại!" });
 
     const match = await bcrypt.compare(usr_pass, foundUser.usr_pass);
 
@@ -57,10 +58,13 @@ class AuthService {
     if (!match && foundUser.usr_lock_count === 5) {
       await userRepository.update({ usr_id: foundUser.usr_id }, { usr_blocked: true, usr_lock_time: new Date() });
 
-      return { status: "-1", message: "Account Has Blocked" };
+      return responseClient({
+        status: "-1",
+        message: "Tài khoản của bạn đã bị khoá, vui lòng liên hệ admin để xử lý!",
+      });
     }
 
-    if (!match) return { status: "-1", message: "login failed" };
+    if (!match) return responseClient({ status: "-1", message: "Mật khẩu của bạn chưa chính xác, vui lòng thử lại!" });
 
     const { publicKey, privateKey } = await KeyTokenService.getKeyStoreByUserId({ usr_id: foundUser.usr_id });
 
