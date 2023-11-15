@@ -8,7 +8,7 @@ router.post("/add-new-carts", authentication, asyncHandler(CartsController.addNe
 router.post("/add-to-carts", authentication, asyncHandler(CartsController.addToCarts));
 router.post("/update-carts", authentication, asyncHandler(CartsController.updateCarts));
 router.post("/get-detail-carts", authentication, asyncHandler(CartsController.getDetailCarts));
-router.get("/get-all-carts", authentication, asyncHandler(CartsController.getAllCarts));
+router.post("/get-all-carts", authentication, asyncHandler(CartsController.getAllCarts));
 router.post("/delete-carts", authentication, asyncHandler(CartsController.deleteCarts));
 
 export default router;
