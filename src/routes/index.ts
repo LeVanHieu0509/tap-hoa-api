@@ -1,9 +1,10 @@
 import APIError from "../apps/global/response/apierror";
 import auth from "./auth";
-import products from "./products";
-import pdf from "./pdf";
+import bills from "./bills";
 import carts from "./carts";
 import checkout from "./checkout";
+import pdf from "./pdf";
+import products from "./products";
 
 function route(app) {
   app.use(
@@ -44,6 +45,14 @@ function route(app) {
       next();
     },
     checkout
+  );
+
+  app.use(
+    "/v1/api/bills",
+    function (req, res, next) {
+      next();
+    },
+    bills
   );
 
   app.use((req, res, next) => {

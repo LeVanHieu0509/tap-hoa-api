@@ -7,7 +7,7 @@ interface RequestCustom extends Request {
 }
 
 class AuthController {
-  constructor(parameters) { }
+  constructor(parameters) {}
 
   public static insert = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -65,7 +65,7 @@ class AuthController {
     }
   };
 
-  public static changePass = async (req: RequestCustom, res: Response, next: NextFunction) => { };
+  public static changePass = async (req: RequestCustom, res: Response, next: NextFunction) => {};
 }
 
 export default AuthController;

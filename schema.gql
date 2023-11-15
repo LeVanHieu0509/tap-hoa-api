@@ -3,7 +3,20 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
+type Bills {
+  cart: Carts!
+  cart_products: String!
+  createdAt: DateTime!
+  id: Float!
+  status: String!
+  total_customer_price: Float!
+  total_price: Float!
+  total_refund_price: Float!
+  updatedAt: DateTime!
+}
+
 type Carts {
+  cart: [Bills!]!
   cart_count_product: String!
   cart_products: String!
   cart_state: String!

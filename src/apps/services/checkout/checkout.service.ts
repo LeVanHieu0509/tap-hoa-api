@@ -1,14 +1,14 @@
 import { getCustomRepository } from "typeorm";
 import { BadRequestError } from "../../../core/error.response";
 import { responseClient } from "../../../utils";
-import { MESSAGE_SUCCESS } from "../../constants";
+import { MESSAGE_NOTFOUND, MESSAGE_SUCCESS } from "../../constants";
 import { CartsRepository } from "../../repositories/carts.repository";
 import { ProductsRepository } from "../../repositories/products.reposiotory";
 import { findCartById } from "../carts/repo.service";
 import { getProductByProductCode } from "../product/repo.service";
+import { insertBill } from "../bills/bills.service";
 
-export const checkoutReview = async (req) => {
-  const { id } = req.body;
+export const checkOrder = async ({ id }) => {
   const foundCarts = await findCartById({ id });
 
   if (!foundCarts) throw new BadRequestError("Không tìm thấy carts nào!");
@@ -39,13 +39,26 @@ export const checkoutReview = async (req) => {
 
     newCartsProduct.push(product);
   }
+
+  return {
+    cartProducts: newCartsProduct,
+    totalQuantity: checkout_order.totalQuantity, // tong tien hang
+    totalPrice: checkout_order.totalPrice,
+  };
+};
+
+export const checkoutReview = async (body) => {
+  const { id } = body ?? {};
+  const ordersUser = await checkOrder({ id });
+
   //tra ve data de xuat file pdf
   return responseClient({
     status: "1",
     message: MESSAGE_SUCCESS,
     data: {
-      cartProducts: newCartsProduct,
-      ...checkout_order,
+      cartProducts: ordersUser.cartProducts,
+      totalQuantity: ordersUser.totalQuantity, // tong tien hang
+      totalPrice: ordersUser.totalPrice,
     },
   });
 };
@@ -67,6 +80,7 @@ const checkValidProducts = async (list) => {
     listOutOfStock: listOutOfStock,
   };
 };
+// sau khi user thanh toán xong thì cần phải lưu lại bills để quản lý status bill và thống kê sau này.
 
 export const orderByUser = async (req) => {
   const { id, user_address, user_payment } = req.body ?? {};
@@ -77,7 +91,9 @@ export const orderByUser = async (req) => {
   const foundCarts = await findCartById({ id: id });
 
   if (!foundCarts) throw new BadRequestError("Không tìm thấy cart nào!");
-  if (foundCarts.cart_state !== "active") throw new BadRequestError("Bạn đã xác nhận đơn này rồi, vui lòng thử lại!");
+
+  if (foundCarts.cart_state == "success") throw new BadRequestError("Bạn đã xác nhận đơn này rồi, vui lòng thử lại!");
+  if (foundCarts.cart_state == "failed") throw new BadRequestError("Đơn này đã bị huỷ, vui lòng tạo lại đơn mới!");
 
   const cartProducts = JSON.parse(foundCarts.cart_products);
 
@@ -107,6 +123,15 @@ export const orderByUser = async (req) => {
       );
     }
 
+    //insert to bill after enhance
+    const data = await checkOrder({ id });
+    await insertBill({
+      cart_id: foundCarts.id,
+      total_price: data?.totalPrice,
+      cartProducts: data?.cartProducts,
+      total_customer_price: data?.totalPrice,
+    });
+
     return responseClient({
       status: "1",
       message: "Bạn đã xác nhận đơn thành công!",
@@ -116,6 +141,37 @@ export const orderByUser = async (req) => {
       message: "Sản phẩm bị quá số lượng, vui lòng thử lại!",
       status: "-1",
       data: statusProducts.listOutOfStock,
+    });
+  }
+};
+
+export const cancelByUser = async (req) => {
+  const { id } = req.body ?? {};
+  const cartRepository = getCustomRepository(CartsRepository);
+
+  const foundCarts = await findCartById({ id: id });
+
+  if (!foundCarts) throw new BadRequestError("Không tìm thấy đơn nào!");
+  if (foundCarts.cart_state == "failed") throw new BadRequestError("Đơn này đã bị huỷ, vui lòng tạo lại đơn mới!");
+
+  if (foundCarts) {
+    await cartRepository.update(
+      {
+        id,
+      },
+      {
+        cart_state: "failed",
+      }
+    );
+
+    return responseClient({
+      status: "1",
+      message: "Bạn đã huỷ đơn thành công!",
+    });
+  } else {
+    return responseClient({
+      status: "-1",
+      message: MESSAGE_NOTFOUND,
     });
   }
 };

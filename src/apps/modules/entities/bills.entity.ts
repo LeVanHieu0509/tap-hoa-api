@@ -5,38 +5,37 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import Users from "./users.entity";
-import { Bills } from "./bills.entity";
+import { Carts } from "./carts.entity";
 
 @ObjectType()
 @Entity()
-export class Carts {
+export class Bills {
   @Field((_type) => Number)
   @PrimaryGeneratedColumn()
   public id!: number;
 
-  @Field((_type) => Users)
-  @ManyToOne((_type) => Users, (users: Users) => users.cart, {
-    primary: true,
-  })
-  @JoinColumn({ name: "usr_id" })
-  public usr_id!: Users;
+  @Field((_type) => Number)
+  @Column({ type: "float", nullable: true })
+  public total_price!: number;
+
+  @Field((_type) => Number)
+  @Column({ type: "float", nullable: true })
+  public total_customer_price!: number;
+
+  @Field((_type) => Number)
+  @Column({ type: "float", nullable: true })
+  public total_refund_price!: number;
 
   @Field((_type) => String)
   @Column({ type: "varchar", nullable: true })
-  public cart_state!: string;
+  public status!: string;
 
   @Field((_type) => String)
   @Column({ type: "varchar", nullable: true })
   public cart_products!: string; //array
-
-  @Field((_type) => String)
-  @Column({ type: "int", default: 0 })
-  public cart_count_product!: number;
 
   @Field()
   @Column()
@@ -48,7 +47,10 @@ export class Carts {
   @UpdateDateColumn()
   public updatedAt!: Date;
 
-  @Field((_type) => [Bills])
-  @OneToMany((_type) => Bills, (key: Bills) => key.cart)
-  public cart!: Bills[];
+  @Field((_type) => Carts)
+  @ManyToOne((_type) => Carts, (users: Carts) => users.cart, {
+    primary: true,
+  })
+  @JoinColumn({ name: "cart_id" })
+  public cart!: Carts;
 }

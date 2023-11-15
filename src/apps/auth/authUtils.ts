@@ -20,7 +20,7 @@ export interface RequestCustom extends Request {
 export const createTokenPair = async (payload, publicKey, privateKey) => {
   try {
     const accessToken = signJwt(payload, publicKey, {
-      expiresIn: "2d",
+      expiresIn: "30d",
     });
 
     const refreshToken = await signRefreshToken(payload, privateKey, {
