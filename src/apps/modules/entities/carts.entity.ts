@@ -31,7 +31,7 @@ export class Carts {
   public cart_state!: string;
 
   @Field((_type) => String)
-  @Column({ type: "varchar", nullable: true })
+  @Column({ type: "text", nullable: true })
   public cart_products!: string; //array
 
   @Field((_type) => String)

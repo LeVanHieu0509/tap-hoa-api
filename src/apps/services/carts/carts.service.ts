@@ -1,4 +1,5 @@
 import { getCustomRepository } from "typeorm";
+import { responseClient } from "../../../utils";
 import { HEADER } from "../../auth/authUtils";
 import {
   MESSAGE_ADD_FAILED,
@@ -10,8 +11,8 @@ import {
   MESSAGE_UPDATE_SUCCESS,
 } from "../../constants";
 import { CartsRepository } from "../../repositories/carts.repository";
-import { findAllCarts, findCartById, findCartByUser } from "./repo.service";
-import { responseClient } from "../../../utils";
+import { findAllCarts, findCartById } from "./repo.service";
+import { getProductByProductCode } from "../product/repo.service";
 
 export const addNewCarts = async (req) => {
   const { products } = req.body ?? {};
@@ -19,9 +20,23 @@ export const addNewCarts = async (req) => {
 
   const cartRepository = getCustomRepository(CartsRepository);
 
+  const newProducts = [];
+  for (let i = 0; i < products.length; i++) {
+    const element = products[i];
+
+    const foundProduct = await getProductByProductCode({ product_code: element.product_code });
+
+    newProducts.push({
+      product_code: element.product_code,
+      product_name: foundProduct.product_name,
+      product_price_sell: foundProduct.product_price_sell,
+      product_quantity: element.quantity,
+    });
+  }
+
   const newCart = await cartRepository.create({
     usr_id: usr_id,
-    cart_products: JSON.stringify(products),
+    cart_products: JSON.stringify(newProducts),
     cart_state: "active",
   });
 
@@ -49,12 +64,28 @@ export const addToCarts = async (req) => {
   const fountCard = await findCartById({ id });
 
   if (fountCard) {
+    const newProducts = [];
+
+    for (let i = 0; i < products.length; i++) {
+      const element = products[i];
+
+      const foundProduct = await getProductByProductCode({ product_code: element.product_code });
+
+      newProducts.push({
+        product_code: element.product_code,
+        product_name: foundProduct.product_name,
+        product_price_sell: foundProduct.product_price_sell,
+        product_quantity: element.quantity,
+      });
+    }
+
+    console.log("fountCard", newProducts);
     const result = await cartRepository.update(
       {
         id: id,
       },
       {
-        cart_products: JSON.stringify(products),
+        cart_products: JSON.stringify(newProducts),
       }
     );
 
@@ -80,12 +111,26 @@ export const updateCarts = async (req) => {
   const fountCard = await findCartById({ id });
 
   if (fountCard.cart_state == "active") {
+    const newProducts = [];
+    for (let i = 0; i < products.length; i++) {
+      const element = products[i];
+
+      const foundProduct = await getProductByProductCode({ product_code: element.product_code });
+
+      newProducts.push({
+        product_code: element.product_code,
+        product_name: foundProduct.product_name,
+        product_price_sell: foundProduct.product_price_sell,
+        product_quantity: element.quantity,
+      });
+    }
+
     const result = await cartRepository.update(
       {
         id: data.id,
       },
       {
-        cart_products: JSON.stringify(products),
+        cart_products: JSON.stringify(newProducts),
       }
     );
 

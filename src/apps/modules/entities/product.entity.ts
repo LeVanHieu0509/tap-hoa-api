@@ -43,7 +43,7 @@ export class Products {
   public product_name!: string;
 
   @Field()
-  @Column({ type: "nvarchar", nullable: true })
+  @Column({ type: "text", nullable: true })
   public product_description!: string;
 
   @Field()
