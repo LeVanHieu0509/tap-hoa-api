@@ -22,7 +22,7 @@ export const checkOrder = async ({ id }) => {
   const newCartsProduct = [];
 
   for (let i = 0; i < cartProducts.length; i++) {
-    let { product_code, quantity } = cartProducts[i];
+    let { product_code, product_quantity } = cartProducts[i];
     const foundProduct = await getProductByProductCode({ product_code });
 
     const product = {
@@ -30,12 +30,12 @@ export const checkOrder = async ({ id }) => {
       product_code: foundProduct.product_code,
       product_name: foundProduct.product_name,
       product_price_sell: foundProduct.product_price_sell,
-      product_quantity_order: quantity,
-      product_total_price: foundProduct.product_price_sell * quantity,
+      product_quantity_order: product_quantity,
+      product_total_price: foundProduct.product_price_sell * product_quantity,
     };
 
     checkout_order.totalPrice = checkout_order.totalPrice + product.product_total_price;
-    checkout_order.totalQuantity = checkout_order.totalQuantity + quantity;
+    checkout_order.totalQuantity = checkout_order.totalQuantity + product_quantity;
 
     newCartsProduct.push(product);
   }
@@ -67,10 +67,10 @@ const checkValidProducts = async (list) => {
   const listOutOfStock = [];
 
   for (let i = 0; i < list.length; i++) {
-    const { product_code, quantity } = list[i];
+    const { product_code, product_quantity } = list[i];
     const foundProduct = getProductByProductCode({ product_code });
 
-    if ((await foundProduct).product_quantity - quantity < 0) {
+    if ((await foundProduct).product_quantity - product_quantity < 0) {
       listOutOfStock.push(product_code);
     }
   }
@@ -101,7 +101,7 @@ export const orderByUser = async (req) => {
 
   if (statusProducts.isValid) {
     for (let i = 0; i < cartProducts.length; i++) {
-      const { product_code, quantity } = cartProducts[i];
+      const { product_code, product_quantity } = cartProducts[i];
       const foundProduct = await getProductByProductCode({ product_code });
 
       await productRepository.update(
@@ -109,7 +109,7 @@ export const orderByUser = async (req) => {
           product_code,
         },
         {
-          product_quantity: foundProduct.product_quantity - quantity,
+          product_quantity: foundProduct.product_quantity - product_quantity,
         }
       );
 
@@ -138,7 +138,9 @@ export const orderByUser = async (req) => {
     });
   } else {
     return responseClient({
-      message: "Sản phẩm bị quá số lượng, vui lòng thử lại!",
+      message: `Sản phẩm có mã ${statusProducts.listOutOfStock.map(
+        (item) => item
+      )} bị quá số lượng, vui lòng thử lại! `,
       status: "-1",
       data: statusProducts.listOutOfStock,
     });
