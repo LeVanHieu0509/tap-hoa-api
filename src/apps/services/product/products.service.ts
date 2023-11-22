@@ -249,3 +249,26 @@ export const updateProduct = async (data) => {
     };
   }
 };
+
+export const generalAutoProduct = async (data) => {
+  const { product_bar_code } = data ?? {};
+
+  //Crawl API get name product
+  if (product_bar_code) {
+    const resCrawlProduct = await getCrawlProduct({ product_bar_code });
+    const dataCrawlProduct = resCrawlProduct.data.items;
+    return {
+      status: "1",
+      message: MESSAGE_GET_SUCCESS,
+      data: {
+        name: get(head(dataCrawlProduct), "name"),
+        product_image_url: get(head(dataCrawlProduct), "image_url"),
+      },
+    };
+  } else {
+    return {
+      status: "-1",
+      message: MESSAGE_NOTFOUND,
+    };
+  }
+};

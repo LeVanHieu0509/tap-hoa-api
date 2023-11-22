@@ -3,6 +3,7 @@ import { SuccessResponse } from "../../core/success.response";
 import {
   createProduct,
   deleteProduct,
+  generalAutoProduct,
   getProduct,
   getProducts,
   updateProduct,
@@ -42,6 +43,13 @@ class ProductsController {
     new SuccessResponse({
       message: "Process Update Product!",
       metadata: await updateProduct(req.body),
+    }).send(res);
+  };
+
+  public static generalAutoProduct = async (req: Request, res: Response, next: NextFunction) => {
+    new SuccessResponse({
+      message: "Process generalAutoProduct!",
+      metadata: await generalAutoProduct(req.body),
     }).send(res);
   };
 
