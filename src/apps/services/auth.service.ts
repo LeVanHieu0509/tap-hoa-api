@@ -178,7 +178,7 @@ class AuthService {
     const userId = req.headers[HEADER.CLIENT_ID];
 
     if (!refreshToken) throw new BadRequestError("refreshToken Not Found");
-    if (!userId) throw new AuthFailureError("Invalid Request");
+    if (!userId) throw new AuthFailureError("Không có quyền đăng nhập");
 
     const keyToken = await KeyTokenService.getKeyStoreByUserId({ usr_id: userId });
     if (!keyToken) throw new NotFoundError("Not Found KeyToken");

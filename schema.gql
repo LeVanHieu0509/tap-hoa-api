@@ -13,6 +13,7 @@ type Bills {
   total_price: Float!
   total_refund_price: Float!
   updatedAt: DateTime!
+  usr_id: Users!
 }
 
 type Carts {
@@ -47,6 +48,7 @@ type Query {
 }
 
 type Users {
+  bill: [Bills!]!
   cart: [Carts!]!
   createdAt: DateTime!
   keys: [Keys!]!

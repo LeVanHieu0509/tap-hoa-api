@@ -38,7 +38,7 @@ export const createTokenPair = async (payload, publicKey, privateKey) => {
 export const authentication = asyncHandler(async (req: RequestCustom, res: Response, next: NextFunction) => {
   //1. Check user id missing???
   const userId = req.headers[HEADER.CLIENT_ID];
-  if (!userId) throw new AuthFailureError("Invalid Request");
+  if (!userId) throw new AuthFailureError("Không có quyền đăng nhập");
 
   //2. check keyStore with this user id
 

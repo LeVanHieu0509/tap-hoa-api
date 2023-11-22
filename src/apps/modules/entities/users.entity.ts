@@ -12,6 +12,7 @@ import {
 } from "typeorm";
 import { Keys } from "./keys.entity";
 import { Carts } from "./carts.entity";
+import { Bills } from "./bills.entity";
 
 @ObjectType()
 @Entity({
@@ -99,5 +100,9 @@ export class Users {
   @Field((_type) => [Carts])
   @OneToMany((_type) => Carts, (key: Carts) => key.usr_id)
   public cart!: Carts[];
+
+  @Field((_type) => [Bills])
+  @OneToMany((_type) => Bills, (key: Bills) => key.usr_id)
+  public bill!: Bills[];
 }
 export default Users;

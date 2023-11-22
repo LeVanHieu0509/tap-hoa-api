@@ -1,5 +1,5 @@
 import { getCustomRepository } from "typeorm";
-import { BadRequestError } from "../../../core/error.response";
+import { AuthFailureError, BadRequestError } from "../../../core/error.response";
 import { responseClient } from "../../../utils";
 import { MESSAGE_NOTFOUND, MESSAGE_SUCCESS } from "../../constants";
 import { CartsRepository } from "../../repositories/carts.repository";
@@ -7,6 +7,7 @@ import { ProductsRepository } from "../../repositories/products.reposiotory";
 import { findCartById } from "../carts/repo.service";
 import { getProductByProductCode } from "../product/repo.service";
 import { insertBill } from "../bills/bills.service";
+import { HEADER } from "../../auth/authUtils";
 
 export const checkOrder = async ({ id }) => {
   const foundCarts = await findCartById({ id });
@@ -47,8 +48,8 @@ export const checkOrder = async ({ id }) => {
   };
 };
 
-export const checkoutReview = async (body) => {
-  const { id } = body ?? {};
+export const checkoutReview = async (req) => {
+  const { id } = req ?? {};
   const ordersUser = await checkOrder({ id });
 
   //tra ve data de xuat file pdf
@@ -84,12 +85,13 @@ const checkValidProducts = async (list) => {
 
 export const orderByUser = async (req) => {
   const { id, user_address, user_payment } = req.body ?? {};
-
+  const userId = req.headers[HEADER.CLIENT_ID];
   const productRepository = getCustomRepository(ProductsRepository);
   const cartRepository = getCustomRepository(CartsRepository);
 
   const foundCarts = await findCartById({ id: id });
 
+  if (!userId) throw new AuthFailureError("Không có quyền đăng nhập");
   if (!foundCarts) throw new BadRequestError("Không tìm thấy cart nào!");
 
   if (foundCarts.cart_state == "success") throw new BadRequestError("Bạn đã xác nhận đơn này rồi, vui lòng thử lại!");
@@ -125,11 +127,13 @@ export const orderByUser = async (req) => {
 
     //insert to bill after enhance
     const data = await checkOrder({ id });
+
     await insertBill({
       cart_id: foundCarts.id,
       total_price: data?.totalPrice,
       cartProducts: data?.cartProducts,
       total_customer_price: data?.totalPrice,
+      usr_id: userId,
     });
 
     return responseClient({

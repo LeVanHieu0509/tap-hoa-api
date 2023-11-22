@@ -79,7 +79,6 @@ export const addToCarts = async (req) => {
       });
     }
 
-    console.log("fountCard", newProducts);
     const result = await cartRepository.update(
       {
         id: id,

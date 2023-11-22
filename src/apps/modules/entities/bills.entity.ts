@@ -9,6 +9,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { Carts } from "./carts.entity";
+import Users from "./users.entity";
 
 @ObjectType()
 @Entity()
@@ -53,4 +54,11 @@ export class Bills {
   })
   @JoinColumn({ name: "cart_id" })
   public cart!: Carts;
+
+  @Field((_type) => Users)
+  @ManyToOne((_type) => Users, (users: Users) => users.keys, {
+    primary: true,
+  })
+  @JoinColumn({ name: "usr_id" })
+  public usr_id!: Users;
 }

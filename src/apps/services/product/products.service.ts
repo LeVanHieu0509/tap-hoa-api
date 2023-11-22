@@ -22,7 +22,7 @@ import { BadRequestError } from "../../../core/error.response";
 
 function generateId(): string {
   // String include number and uppercase character
-  const generateId = customAlphabet("0123456789", 5);
+  const generateId = customAlphabet("123456789", 6);
   return generateId();
 }
 
@@ -96,7 +96,7 @@ export const createProduct = async (data: Products) => {
 
     //set product code auto when only product code bar
     if (!foundProduct) {
-      product_code = generateId();
+      product_code = `SP_${generateId()}`;
     } else {
       product_code = foundProduct.product_code;
     }
@@ -119,9 +119,10 @@ export const createProduct = async (data: Products) => {
         product_code,
       },
       {
-        product_quantity: foundProduct.product_quantity + product_quantity,
+        product_name,
         product_manufacture_date,
         product_expired_date,
+        product_quantity: foundProduct.product_quantity + product_quantity,
       }
     );
 
@@ -141,8 +142,8 @@ export const createProduct = async (data: Products) => {
       ...data,
       product_code: product_code,
       categories: categories,
-      product_name: dataCrawlProduct ? get(head(dataCrawlProduct), "name") : product_name,
-      product_image_url: dataCrawlProduct ? get(head(dataCrawlProduct), "image_url") : product_image_url,
+      product_name: dataCrawlProduct.length > 0 ? get(head(dataCrawlProduct), "name") : product_name,
+      product_image_url: dataCrawlProduct.length > 0 ? get(head(dataCrawlProduct), "image_url") : product_image_url,
     });
 
     const newProduct = await productRepository.save(product);

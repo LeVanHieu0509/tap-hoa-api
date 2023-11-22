@@ -12,12 +12,14 @@ export const insertBill = async ({
   total_refund_price,
   cartProducts,
   cart_id,
+  usr_id,
 }: {
   total_price: number;
   total_customer_price?: number;
   total_refund_price?: number;
   cartProducts: any;
   cart_id: any;
+  usr_id: any;
 }) => {
   const billRepository = getCustomRepository(BillsRepository);
 
@@ -34,6 +36,7 @@ export const insertBill = async ({
     total_customer_price,
     total_refund_price,
     cart_products: JSON.stringify(cartProducts),
+    usr_id: usr_id,
   });
 
   await billRepository.save(newBill);
