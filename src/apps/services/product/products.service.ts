@@ -86,7 +86,7 @@ export const createProduct = async (data: Products) => {
   } = data ?? {};
 
   let foundProduct: Products;
-  let dataCrawlProduct;
+  // let dataCrawlProduct;
   const productRepository = getCustomRepository(ProductsRepository);
 
   if (isCheckHasValue(product_bar_code) && isCheckHasValue(product_code)) {
@@ -96,7 +96,7 @@ export const createProduct = async (data: Products) => {
 
     //set product code auto when only product code bar
     if (!foundProduct) {
-      product_code = `SP_${generateId()}`;
+      product_code = `SP${generateId()}`;
     } else {
       product_code = foundProduct.product_code;
     }
@@ -107,10 +107,10 @@ export const createProduct = async (data: Products) => {
   }
 
   //Crawl API get name product
-  if (product_bar_code) {
-    const resCrawlProduct = await getCrawlProduct({ product_bar_code });
-    dataCrawlProduct = resCrawlProduct.data.items;
-  }
+  // if (product_bar_code) {
+  //   const resCrawlProduct = await getCrawlProduct({ product_bar_code });
+  //   dataCrawlProduct = resCrawlProduct.data.items;
+  // }
 
   // if you find product has in store, only update product_quantity up to quantity
   if (foundProduct) {
@@ -119,6 +119,7 @@ export const createProduct = async (data: Products) => {
         product_code,
       },
       {
+        product_image_url: product_image_url,
         product_name,
         product_manufacture_date,
         product_expired_date,
@@ -142,8 +143,8 @@ export const createProduct = async (data: Products) => {
       ...data,
       product_code: product_code,
       categories: categories,
-      product_name: dataCrawlProduct.length > 0 ? get(head(dataCrawlProduct), "name") : product_name,
-      product_image_url: dataCrawlProduct.length > 0 ? get(head(dataCrawlProduct), "image_url") : product_image_url,
+      product_name: product_name,
+      product_image_url: product_image_url,
     });
 
     const newProduct = await productRepository.save(product);
@@ -262,7 +263,7 @@ export const generalAutoProduct = async (data) => {
       status: "1",
       message: MESSAGE_GET_SUCCESS,
       data: {
-        name: get(head(dataCrawlProduct), "name"),
+        product_name: get(head(dataCrawlProduct), "name"),
         product_image_url: get(head(dataCrawlProduct), "image_url"),
       },
     };

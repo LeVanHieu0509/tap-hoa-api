@@ -35,7 +35,7 @@ export const addNewCarts = async (req) => {
   }
 
   const newCart = await cartRepository.create({
-    usr_id: usr_id,
+    user: usr_id,
     cart_products: JSON.stringify(newProducts),
     cart_state: "active",
   });

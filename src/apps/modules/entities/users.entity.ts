@@ -98,11 +98,11 @@ export class Users {
   public keys!: Keys[];
 
   @Field((_type) => [Carts])
-  @OneToMany((_type) => Carts, (key: Carts) => key.usr_id)
+  @OneToMany((_type) => Carts, (key: Carts) => key.user)
   public cart!: Carts[];
 
   @Field((_type) => [Bills])
-  @OneToMany((_type) => Bills, (key: Bills) => key.usr_id)
+  @OneToMany((_type) => Bills, (key: Bills) => key.user)
   public bill!: Bills[];
 }
 export default Users;

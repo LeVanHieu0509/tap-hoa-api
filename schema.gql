@@ -13,7 +13,7 @@ type Bills {
   total_price: Float!
   total_refund_price: Float!
   updatedAt: DateTime!
-  usr_id: Users!
+  user: Users!
 }
 
 type Carts {
@@ -24,7 +24,7 @@ type Carts {
   createdAt: DateTime!
   id: Float!
   updatedAt: DateTime!
-  usr_id: Users!
+  user: Users!
 }
 
 """

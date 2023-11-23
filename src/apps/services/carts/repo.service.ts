@@ -5,7 +5,7 @@ export const findCartByUser = async ({ usr_id }) => {
   const cartRepository = getCustomRepository(CartsRepository);
 
   const userCart = await cartRepository.findOne({
-    usr_id,
+    user: usr_id,
   });
 
   return userCart;
@@ -24,6 +24,8 @@ export const findCartById = async ({ id }) => {
 export const findAllCarts = async ({ limit, sortOrder, sortBy, page, filter, select = [] }: any) => {
   const productRepository = getCustomRepository(CartsRepository);
   const queryBuilder = productRepository.createQueryBuilder("carts");
+
+  queryBuilder.leftJoinAndSelect("carts.user", "user");
 
   // Sort by column and order
   if (sortBy && sortOrder) {

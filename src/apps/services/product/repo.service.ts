@@ -4,13 +4,23 @@ import { ProductsRepository } from "../../repositories/products.reposiotory";
 export const getProductByProductCode = async ({ product_code }) => {
   const productRepository = getCustomRepository(ProductsRepository);
 
-  return await productRepository.findOne({ product_code });
+  return await productRepository.findOne({
+    where: {
+      product_code,
+    },
+    relations: ["categories"],
+  });
 };
 
 export const getProductByProductBarCode = async ({ product_bar_code }) => {
   const productRepository = getCustomRepository(ProductsRepository);
 
-  return await productRepository.findOne({ product_bar_code });
+  return await productRepository.findOne({
+    where: {
+      product_bar_code,
+    },
+    relations: ["categories"],
+  });
 };
 
 export const queryProduct = async ({ query, limit, skip }) => {
@@ -20,6 +30,7 @@ export const queryProduct = async ({ query, limit, skip }) => {
     ...query,
     limit,
     skip,
+    relations: ["categories"],
   });
 };
 
@@ -35,6 +46,9 @@ export const findAllProducts = async ({
 }: any) => {
   const productRepository = getCustomRepository(ProductsRepository);
   const queryBuilder = productRepository.createQueryBuilder("products");
+
+  //query toi bang categories
+  queryBuilder.leftJoinAndSelect("products.categories", "categories");
 
   if (priceMin && priceMax) {
     queryBuilder.andWhere("products.product_price_sell BETWEEN :priceMin AND :priceMax", { priceMin, priceMax });

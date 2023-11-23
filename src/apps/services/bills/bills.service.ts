@@ -36,7 +36,7 @@ export const insertBill = async ({
     total_customer_price,
     total_refund_price,
     cart_products: JSON.stringify(cartProducts),
-    usr_id: usr_id,
+    user: usr_id,
   });
 
   await billRepository.save(newBill);

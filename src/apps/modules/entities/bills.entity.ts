@@ -60,5 +60,5 @@ export class Bills {
     primary: true,
   })
   @JoinColumn({ name: "usr_id" })
-  public usr_id!: Users;
+  public user!: Users;
 }

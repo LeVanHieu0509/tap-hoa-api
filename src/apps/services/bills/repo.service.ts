@@ -25,6 +25,9 @@ export const findAllBills = async ({ limit, sortOrder, sortBy, page, filter, sel
   const billsRepository = getCustomRepository(BillsRepository);
   const queryBuilder = billsRepository.createQueryBuilder("bills");
 
+  //query toi bang categories
+  queryBuilder.leftJoinAndSelect("bills.cart", "cart");
+
   // Sort by column and order
   if (sortBy && sortOrder) {
     queryBuilder.orderBy(`bills.${sortBy}`, sortOrder.toUpperCase());

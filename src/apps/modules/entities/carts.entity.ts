@@ -24,7 +24,7 @@ export class Carts {
     primary: true,
   })
   @JoinColumn({ name: "usr_id" })
-  public usr_id!: Users;
+  public user!: Users;
 
   @Field((_type) => String)
   @Column({ type: "varchar", nullable: true })
