@@ -50,7 +50,7 @@ export const authentication = asyncHandler(async (req: RequestCustom, res: Respo
   const accessToken = authHeader.split(" ")[1];
 
   //3. verify token
-  const decodeUser = verifyJwt(accessToken, keyToken.publicKey);
+  const decodeUser: any = verifyJwt(accessToken, keyToken.publicKey);
 
   if (!decodeUser) throw new AuthFailureError("Access Token Expired");
   //4. check user in dbs

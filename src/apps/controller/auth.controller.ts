@@ -47,7 +47,7 @@ class AuthController {
     try {
       new SuccessResponse({
         message: "Logout Process!",
-        metadata: await AuthService.logout(req.body),
+        metadata: await AuthService.logout(req),
       }).send(res);
     } catch (error) {
       next(error);

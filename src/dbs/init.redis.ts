@@ -6,19 +6,19 @@ dotenv.config();
 let client: any;
 
 (async () => {
-  // client = createClient({
-  //   password: process.env.PASS_WORD_REDIS,
-  //   socket: {
-  //     host: process.env.HOST_REDIS,
-  //     port: +process.env.PORT_REDIS,
-  //   },
-  //   legacyMode: true,
-  // });
-
   client = createClient({
-    url: process.env.HOST_REDIS_URI,
+    password: process.env.REDIS_PASS,
+    socket: {
+      host: process.env.REDIS_HOST,
+      port: +process.env.REDIS_PORT,
+    },
     legacyMode: true,
   });
+
+  // client = createClient({
+  //   url: process.env.REDIS_HOST,
+  //   legacyMode: true,
+  // });
 
   client.on("connect", () => console.log("Redis Client Connected"));
 

@@ -141,7 +141,12 @@ class AuthService {
     });
   };
 
-  public static logout = async ({ refreshToken, userId }) => {
+  public static logout = async (req) => {
+    const userId = req.headers[HEADER.CLIENT_ID];
+    const {
+      body: { refreshToken },
+    } = req;
+
     // Có tài khoản?
     // Có refreshToken?
 
@@ -153,7 +158,7 @@ class AuthService {
     const decodeData: any = await verifyRefreshToken(refreshToken, keyToken.privateKey);
 
     return new Promise((resolve, reject) => {
-      client.del(decodeData.usr_id.toString(), (err, reply) => {
+      client.del(`usr_id:${decodeData.usr_id.toString()}`, (err, reply) => {
         if (err) reject(err);
         if (reply == 1) {
           resolve({

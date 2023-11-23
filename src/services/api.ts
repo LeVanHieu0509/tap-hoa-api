@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const awplClient = axios.create({
-  baseURL: process.env.SERVER_URL,
+  baseURL: process.env.SERVER_LOTTE_URL,
   headers: {
     maxBodyLength: Infinity,
     "Content-Type": "application/json",

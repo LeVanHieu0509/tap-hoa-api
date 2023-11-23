@@ -26,7 +26,7 @@ export const verifyRefreshToken = (token, key) => {
       if (err) {
         reject(err);
       } else
-        client.get(payload.usr_id.toString(), (err, reply) => {
+        client.get(`usr_id:${payload.usr_id.toString()}`, (err, reply) => {
           if (err) {
             return reject(err);
           }
@@ -52,7 +52,7 @@ export const signRefreshToken = (payload, key, options) => {
         if (err) {
           reject(err);
         } else
-          client.set(payload.usr_id.toString(), token, "EX", 365 * 24 * 60 * 60, (err, reply) => {
+          client.set(`usr_id:${payload.usr_id.toString()}`, token, "EX", 365 * 24 * 60 * 60, (err, reply) => {
             if (err) {
               return reject(err);
             }
