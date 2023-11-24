@@ -57,8 +57,6 @@ export const getBills = async ({ limit, sortOrder, sortBy, page, filter, select 
       message: MESSAGE_NOTFOUND,
     };
   }
-
-  return 1;
 };
 
 export const getBill = async (req) => {

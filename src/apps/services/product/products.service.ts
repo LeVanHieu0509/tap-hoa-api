@@ -19,6 +19,7 @@ import { ProductsRepository } from "../../repositories/products.reposiotory";
 import { getCrawlProduct } from "./helper.service";
 import { findAllProducts, getProductByProductBarCode, getProductByProductCode } from "./repo.service";
 import { BadRequestError } from "../../../core/error.response";
+import { crawlDataProductMykiot, crawlDataProductSieuThiDucThanh } from "../../../services/api";
 
 function generateId(): string {
   // String include number and uppercase character
@@ -213,15 +214,15 @@ export const deleteProduct = async ({ product_code }) => {
   if (foundProduct) {
     const deleteKey = await productRepository.delete({ product_code });
 
-    return {
+    return responseClient({
       status: deleteKey.affected,
       message: MESSAGE_DELETE_SUCCESS,
-    };
+    });
   } else {
-    return {
+    return responseClient({
       status: "-1",
       message: MESSAGE_NOTFOUND,
-    };
+    });
   }
 };
 
@@ -240,15 +241,15 @@ export const updateProduct = async (data) => {
       }
     );
 
-    return {
+    return responseClient({
       status: result.affected,
       message: MESSAGE_UPDATE_SUCCESS,
-    };
+    });
   } else {
-    return {
+    return responseClient({
       status: "-1",
       message: MESSAGE_NOTFOUND,
-    };
+    });
   }
 };
 
@@ -259,18 +260,41 @@ export const generalAutoProduct = async (data) => {
   if (product_bar_code) {
     const resCrawlProduct = await getCrawlProduct({ product_bar_code });
     const dataCrawlProduct = resCrawlProduct.data.items;
-    return {
-      status: "1",
-      message: MESSAGE_GET_SUCCESS,
-      data: {
-        product_name: get(head(dataCrawlProduct), "name"),
-        product_image_url: get(head(dataCrawlProduct), "image_url"),
-      },
-    };
+
+    if (!dataCrawlProduct?.length) {
+      const {
+        data: { results },
+      } = await crawlDataProductSieuThiDucThanh({ product_bar_code: product_bar_code });
+
+      if (results?.length) {
+        return responseClient({
+          status: "1",
+          message: MESSAGE_GET_SUCCESS,
+          data: {
+            product_name: results[0].title,
+            product_image_url: `https:${results[0].thumbnail}`,
+          },
+        });
+      } else {
+        return responseClient({
+          status: "-1",
+          message: MESSAGE_NOTFOUND,
+        });
+      }
+    } else {
+      return responseClient({
+        status: "1",
+        message: MESSAGE_GET_SUCCESS,
+        data: {
+          product_name: get(head(dataCrawlProduct), "name"),
+          product_image_url: get(head(dataCrawlProduct), "image_url"),
+        },
+      });
+    }
   } else {
-    return {
+    return responseClient({
       status: "-1",
       message: MESSAGE_NOTFOUND,
-    };
+    });
   }
 };

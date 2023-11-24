@@ -12,3 +12,9 @@ export const getCrawlProduct = async ({ product_bar_code }) => {
 
   return data;
 };
+
+export const crawlDataProductMykiot = async ({ product_bar_code }) => {
+  const { data } = await crawlDataProductCode({ key: product_bar_code });
+
+  return data;
+};

@@ -5,6 +5,7 @@ import carts from "./carts";
 import checkout from "./checkout";
 import pdf from "./pdf";
 import products from "./products";
+import categories from "./categories";
 
 function route(app) {
   app.use(
@@ -53,6 +54,14 @@ function route(app) {
       next();
     },
     bills
+  );
+
+  app.use(
+    "/v1/api/categories",
+    function (req, res, next) {
+      next();
+    },
+    categories
   );
 
   app.use((req, res, next) => {

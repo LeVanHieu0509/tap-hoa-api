@@ -1,10 +1,10 @@
 import { authentication } from "../../apps/auth/authUtils";
 
-import BillsController from "../../apps/controller/bills.controller";
+import CategoriesController from "../../apps/controller/categories.controller";
 import { asyncHandler } from "../../helpers/asyncHandler";
 
 const router = require("express").Router();
 
-router.post("/get-bills", authentication, asyncHandler(BillsController.getBills));
+router.post("/get-categories", authentication, asyncHandler(CategoriesController.getCategories));
 
 export default router;
