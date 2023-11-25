@@ -1,7 +1,7 @@
 import { get, head } from "lodash";
 import { customAlphabet } from "nanoid";
 import { getCustomRepository } from "typeorm";
-import { isCheckHasValue, responseClient } from "../../../utils";
+import { generateId, isCheckHasValue, responseClient } from "../../../utils";
 import {
   MESSAGE_ADD_FAILED,
   MESSAGE_ADD_SUCCESS,
@@ -20,12 +20,6 @@ import { getCrawlProduct } from "./helper.service";
 import { findAllProducts, getProductByProductBarCode, getProductByProductCode } from "./repo.service";
 import { BadRequestError } from "../../../core/error.response";
 import { crawlDataProductMykiot, crawlDataProductSieuThiDucThanh } from "../../../services/api";
-
-function generateId(): string {
-  // String include number and uppercase character
-  const generateId = customAlphabet("123456789", 6);
-  return generateId();
-}
 
 export const getProduct = async (data) => {
   const { product_code, product_bar_code } = data ?? {};
@@ -86,6 +80,7 @@ export const createProduct = async (data: Products) => {
     categories,
   } = data ?? {};
 
+  let gen_product_bar_code = 0;
   let foundProduct: Products;
   // let dataCrawlProduct;
   const productRepository = getCustomRepository(ProductsRepository);
@@ -103,6 +98,8 @@ export const createProduct = async (data: Products) => {
     }
   } else if (isCheckHasValue(product_code) && !isCheckHasValue(product_bar_code)) {
     foundProduct = await getProductByProductCode({ product_code });
+    product_bar_code = `${generateId(12)}`;
+    gen_product_bar_code = 1;
   } else {
     throw new BadRequestError("Vui lòng nhập Mã code hoặc mã vạch");
   }
@@ -142,10 +139,12 @@ export const createProduct = async (data: Products) => {
   } else {
     const product = productRepository.create({
       ...data,
+      product_bar_code,
       product_code: product_code,
       categories: categories,
       product_name: product_name,
       product_image_url: product_image_url,
+      is_gen_product_bar_code: gen_product_bar_code,
     });
 
     const newProduct = await productRepository.save(product);
@@ -166,28 +165,18 @@ export const createProduct = async (data: Products) => {
 };
 
 export const getProducts = async ({
+  searchText,
   limit,
   sortOrder,
-  sortBy = "ctime",
+  sortBy,
   page,
   priceMin,
   priceMax,
-  filter = { isPublished: true },
-  select = [
-    "id",
-    "product_bar_code",
-    "product_code",
-    "product_name",
-    "product_description",
-    "product_image_url",
-    "product_price_origin",
-    "product_price_sell",
-    "product_quantity",
-    "product_manufacture_date",
-    "product_expired_date",
-  ],
+  filter = null,
+  select = null,
 }: any) => {
   const { products, total } = await findAllProducts({
+    searchText,
     limit,
     sortOrder,
     sortBy,
@@ -197,7 +186,7 @@ export const getProducts = async ({
     priceMin,
     priceMax,
   });
-
+  console.log("products", products);
   return {
     status: "1",
     data: {

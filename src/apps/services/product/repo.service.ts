@@ -35,12 +35,13 @@ export const queryProduct = async ({ query, limit, skip }) => {
 };
 
 export const findAllProducts = async ({
+  searchText,
   limit,
   sortOrder,
   sortBy,
   page,
   filter,
-  select = [],
+  select,
   priceMin,
   priceMax,
 }: any) => {
@@ -49,7 +50,12 @@ export const findAllProducts = async ({
 
   //query toi bang categories
   queryBuilder.leftJoinAndSelect("products.categories", "categories");
-
+  if (searchText) {
+    queryBuilder
+      .where("products.product_name LIKE :keyword", { keyword: `%${searchText}%` })
+      .orWhere("products.product_bar_code LIKE :keyword", { keyword: `%${searchText}%` })
+      .orWhere("products.product_code LIKE :keyword", { keyword: `%${searchText}%` });
+  }
   if (priceMin && priceMax) {
     queryBuilder.andWhere("products.product_price_sell BETWEEN :priceMin AND :priceMax", { priceMin, priceMax });
   } else if (priceMin) {

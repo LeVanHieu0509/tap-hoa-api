@@ -2,7 +2,7 @@ import { getCustomRepository } from "typeorm";
 import { BadRequestError } from "../../../core/error.response";
 import { BillsRepository } from "../../repositories/bills.repository";
 import { findCartById } from "../carts/repo.service";
-import { responseClient } from "../../../utils";
+import { generateId, responseClient } from "../../../utils";
 import { findAllBills, findBillsById } from "./repo.service";
 import { MESSAGE_ADD_SUCCESS, MESSAGE_GET_SUCCESS, MESSAGE_NOTFOUND } from "../../constants";
 
@@ -30,6 +30,8 @@ export const insertBill = async ({
     throw new BadRequestError("Có lỗi xảy ra với cart này, vui lòng liên hệ admin để xử lý");
 
   const newBill = await billRepository.create({
+    bills_code: `TT${generateId()}`,
+
     cart: cart_id,
     status: "success",
     total_price,

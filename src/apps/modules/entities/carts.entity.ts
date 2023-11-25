@@ -7,6 +7,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from "typeorm";
 import Users from "./users.entity";
@@ -14,6 +15,7 @@ import { Bills } from "./bills.entity";
 
 @ObjectType()
 @Entity()
+@Unique(["cart_code"])
 export class Carts {
   @Field((_type) => Number)
   @PrimaryGeneratedColumn()
@@ -25,6 +27,10 @@ export class Carts {
   })
   @JoinColumn({ name: "usr_id" })
   public user!: Users;
+
+  @Field()
+  @Column({ type: "varchar", nullable: true, unique: true })
+  public cart_code!: string;
 
   @Field((_type) => String)
   @Column({ type: "varchar", nullable: true })

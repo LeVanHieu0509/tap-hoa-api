@@ -11,6 +11,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from "typeorm";
 import Categories from "./categories";
@@ -25,6 +26,7 @@ class SlugtifiedProductName {
 @Service()
 @Entity()
 @ObjectType()
+@Unique(["product_code", "product_bar_code"])
 export class Products {
   @Field((_type) => Number)
   @PrimaryGeneratedColumn()
@@ -74,11 +76,15 @@ export class Products {
   public product_quantity!: number;
 
   @Field()
-  @Column({ type: "smallint", default: 0, select: false })
+  @Column({ type: "smallint", default: 0 })
   public is_draft!: boolean;
 
   @Field()
-  @Column({ type: "smallint", default: 1, select: false })
+  @Column({ type: "smallint", default: 0 })
+  public is_gen_product_bar_code!: number;
+
+  @Field()
+  @Column({ type: "smallint", default: 1 })
   public is_published!: boolean;
 
   @Field()

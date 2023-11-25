@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { customAlphabet } from "nanoid";
 
 export const resolvePromise = (resolve, reject) => {
   return (err, data) => {
@@ -49,3 +50,9 @@ export const responseClient = ({ status, data, message }: { status: string | num
 export const isCheckHasValue = (value: string) => {
   return typeof value == "string" ? value.length > 0 : !_.isNil(value);
 };
+
+export function generateId(length = 6): string {
+  // String include number and uppercase character
+  const generateId = customAlphabet("123456789", length);
+  return generateId();
+}

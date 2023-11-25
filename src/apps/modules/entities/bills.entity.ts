@@ -18,6 +18,10 @@ export class Bills {
   @PrimaryGeneratedColumn()
   public id!: number;
 
+  @Field()
+  @Column({ type: "varchar", nullable: true, unique: true })
+  public bills_code!: string;
+
   @Field((_type) => Number)
   @Column({ type: "float", nullable: true })
   public total_price!: number;

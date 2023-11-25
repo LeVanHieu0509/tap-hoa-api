@@ -4,6 +4,7 @@
 # -----------------------------------------------
 
 type Bills {
+  bills_code: String!
   cart: Carts!
   cart_products: String!
   createdAt: DateTime!
@@ -18,6 +19,7 @@ type Bills {
 
 type Carts {
   cart: [Bills!]!
+  cart_code: String!
   cart_count_product: String!
   cart_products: String!
   cart_state: String!

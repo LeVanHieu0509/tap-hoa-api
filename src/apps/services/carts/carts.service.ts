@@ -1,5 +1,5 @@
 import { getCustomRepository } from "typeorm";
-import { responseClient } from "../../../utils";
+import { generateId, responseClient } from "../../../utils";
 import { HEADER } from "../../auth/authUtils";
 import {
   MESSAGE_ADD_FAILED,
@@ -35,6 +35,7 @@ export const addNewCarts = async (req) => {
   }
 
   const newCart = await cartRepository.create({
+    cart_code: `HD${generateId()}`,
     user: usr_id,
     cart_products: JSON.stringify(newProducts),
     cart_state: "active",
