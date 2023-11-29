@@ -58,7 +58,7 @@ export class Users {
   public usr_roles!: string;
 
   @Field()
-  @Column({ type: "varchar", nullable: true })
+  @Column({ type: "varchar", nullable: true, select: false })
   public usr_pass!: string;
 
   @Field()

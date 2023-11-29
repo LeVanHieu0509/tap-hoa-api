@@ -1,5 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { SuccessResponse } from "../../core/success.response";
+import { responseClient } from "../../utils";
+import { MESSAGE_NOTFOUND } from "../constants";
 import {
   createProduct,
   deleteProduct,
@@ -47,10 +49,19 @@ class ProductsController {
   };
 
   public static generalAutoProduct = async (req: Request, res: Response, next: NextFunction) => {
-    new SuccessResponse({
-      message: "Process generalAutoProduct!",
-      metadata: await generalAutoProduct(req.body),
-    }).send(res);
+    try {
+      new SuccessResponse({
+        message: "Process generalAutoProduct!",
+        metadata: await generalAutoProduct(req.body),
+      }).send(res);
+    } catch (error) {
+      return res.json(
+        responseClient({
+          message: MESSAGE_NOTFOUND,
+          status: "-1",
+        })
+      );
+    }
   };
 
   public static getSearchProducts = (req: Request, res: Response, next: NextFunction) => {};

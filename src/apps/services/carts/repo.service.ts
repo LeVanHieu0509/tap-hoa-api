@@ -21,6 +21,16 @@ export const findCartById = async ({ id }) => {
   return foundCart;
 };
 
+export const findCartByCartCode = async ({ cart_code }) => {
+  const cartRepository = getCustomRepository(CartsRepository);
+
+  const foundCart = await cartRepository.findOne({
+    cart_code,
+  });
+
+  return foundCart;
+};
+
 export const findAllCarts = async ({ limit, sortOrder, sortBy, page, filter, select = [] }: any) => {
   const productRepository = getCustomRepository(CartsRepository);
   const queryBuilder = productRepository.createQueryBuilder("carts");

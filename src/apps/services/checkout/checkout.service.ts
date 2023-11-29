@@ -4,14 +4,12 @@ import { responseClient } from "../../../utils";
 import { MESSAGE_NOTFOUND, MESSAGE_SUCCESS } from "../../constants";
 import { CartsRepository } from "../../repositories/carts.repository";
 import { ProductsRepository } from "../../repositories/products.reposiotory";
-import { findCartById } from "../carts/repo.service";
+import { findCartByCartCode, findCartById } from "../carts/repo.service";
 import { getProductByProductCode } from "../product/repo.service";
 import { insertBill } from "../bills/bills.service";
 import { HEADER } from "../../auth/authUtils";
 
-export const checkOrder = async ({ id }) => {
-  const foundCarts = await findCartById({ id });
-
+export const checkOrder = async ({ foundCarts }) => {
   if (!foundCarts) throw new BadRequestError("Không tìm thấy carts nào!");
 
   const checkout_order = {
@@ -49,8 +47,17 @@ export const checkOrder = async ({ id }) => {
 };
 
 export const checkoutReview = async (req) => {
-  const { id } = req ?? {};
-  const ordersUser = await checkOrder({ id });
+  const { id, cart_code } = req ?? {};
+  let ordersUser;
+
+  if (id) {
+    const foundCarts = await findCartById({ id });
+    ordersUser = await checkOrder({ foundCarts });
+  }
+  if (cart_code) {
+    const foundCarts = await findCartByCartCode({ cart_code });
+    ordersUser = await checkOrder({ foundCarts });
+  }
 
   //tra ve data de xuat file pdf
   return responseClient({
@@ -126,7 +133,9 @@ export const orderByUser = async (req) => {
     }
 
     //insert to bill after enhance
-    const data = await checkOrder({ id });
+
+    const foundCartsById = await findCartById({ id });
+    const data = await checkOrder({ foundCarts: foundCartsById });
 
     await insertBill({
       cart_id: foundCarts.id,
