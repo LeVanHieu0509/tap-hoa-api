@@ -8,9 +8,18 @@ import { HEADER, createTokenPair } from "../auth/authUtils";
 import User from "../modules/entities/users.entity";
 import { UsersRepository } from "../repositories/users.repository";
 import KeyTokenService from "./keyToken.service";
-import { findByUsername } from "./user.service";
+import { findAllUsers, findByUsername, findUserById, resetPassword } from "./user.service";
 import client from "../../dbs/init.redis";
-import { MESSAGE_NOTFOUND, MESSAGE_SUCCESS } from "../constants";
+import {
+  MESSAGE_DELETE_SUCCESS,
+  MESSAGE_FAILED,
+  MESSAGE_GET_SUCCESS,
+  MESSAGE_NOTFOUND,
+  MESSAGE_RESET_SUCCESS,
+  MESSAGE_SUCCESS,
+  MESSAGE_UPDATE_FAILED,
+  MESSAGE_UPDATE_SUCCESS,
+} from "../constants";
 import { responseClient } from "../../utils";
 
 const RoleUser = {
@@ -99,7 +108,7 @@ class AuthService {
       usr_name: usr_name,
       usr_pass: passwordHash,
       usr_email: usr_email,
-      usr_roles: RoleUser.EMPLOYEE,
+      usr_roles: roles ?? RoleUser.EMPLOYEE,
     });
 
     await userRepository.save(newUser);
@@ -199,6 +208,7 @@ class AuthService {
       keyToken?.publicKey,
       keyToken.privateKey
     );
+
     if (tokens) {
       return responseClient({
         message: MESSAGE_SUCCESS,
@@ -217,6 +227,61 @@ class AuthService {
   };
 
   public static changePass = async ({ email, password }, userId) => {};
+
+  public static deleteUser = async ({ usr_id }) => {
+    const userRepository = getCustomRepository(UsersRepository);
+    const foundProduct = await findUserById({ usr_id });
+
+    if (foundProduct) {
+      const deleteKey = await userRepository.delete({ usr_id });
+
+      return responseClient({
+        status: deleteKey.affected,
+        message: MESSAGE_DELETE_SUCCESS,
+      });
+    } else {
+      return responseClient({
+        status: "-1",
+        message: MESSAGE_NOTFOUND,
+      });
+    }
+  };
+
+  public static resetPass = async ({ usr_id, usr_pass, usr_name }) => {
+    const foundUser = await findUserById({ usr_id });
+    if (!foundUser) return responseClient({ status: "-1", message: MESSAGE_NOTFOUND });
+
+    const result = await resetPassword({ usr_id, usr_pass, usr_name });
+
+    if (result == 1) {
+      return responseClient({ status: result, message: MESSAGE_RESET_SUCCESS });
+    } else {
+      return responseClient({
+        status: result,
+        message: MESSAGE_FAILED,
+      });
+    }
+  };
+
+  public static getUsers = async ({ limit, sortOrder, sortBy, page, filter = null, select = null }: any) => {
+    const { users, total } = await findAllUsers({
+      limit,
+      sortOrder,
+      sortBy,
+      page,
+      filter,
+      select,
+    });
+
+    return responseClient({
+      message: MESSAGE_GET_SUCCESS,
+      status: "1",
+      data: {
+        users,
+        total,
+      },
+    });
+  };
 }
 
 export default AuthService;

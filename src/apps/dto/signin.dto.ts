@@ -2,8 +2,8 @@ const { Joi, Segments } = require("celebrate");
 
 const signUpDto = {
   [Segments.BODY]: Joi.object().keys({
-    usr_name: Joi.string().alphanum().min(8).max(30).required(),
-    password: Joi.string().required().min(8),
+    usr_name: Joi.string().alphanum().min(6).max(30).required(),
+    password: Joi.string().required().min(6),
   }),
 };
 

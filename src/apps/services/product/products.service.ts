@@ -186,7 +186,7 @@ export const getProducts = async ({
     priceMin,
     priceMax,
   });
-  console.log("products", products);
+
   return {
     status: "1",
     data: {

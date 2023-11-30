@@ -65,7 +65,40 @@ class AuthController {
     }
   };
 
+  public static getUsers = async (req: RequestCustom, res: Response, next: NextFunction) => {
+    try {
+      new CREATED({
+        message: "getUsers Process!",
+        metadata: await AuthService.getUsers(req.body),
+      }).send(res);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public static changePass = async (req: RequestCustom, res: Response, next: NextFunction) => {};
+
+  public static resetPassword = async (req: RequestCustom, res: Response, next: NextFunction) => {
+    try {
+      new SuccessResponse({
+        message: "resetPass Process!",
+        metadata: await AuthService.resetPass(req.body),
+      }).send(res);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public static deleteUser = async (req: RequestCustom, res: Response, next: NextFunction) => {
+    try {
+      new SuccessResponse({
+        message: "deleteUser Process!",
+        metadata: await AuthService.deleteUser(req.body),
+      }).send(res);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 export default AuthController;

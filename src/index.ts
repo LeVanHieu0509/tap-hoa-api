@@ -39,8 +39,6 @@ const bootstrap = async () => {
     require("./dbs/init.my-sql");
     require("./dbs/init.redis");
 
-    route(app);
-
     app.use(cors(corsConfig));
 
     //Apolo server sẽ tạo graphql server,
