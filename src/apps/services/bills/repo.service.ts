@@ -41,10 +41,13 @@ export const findAllBills = async ({ limit, sortOrder, sortBy, page, filter, sel
   }
 
   if (filter) {
-    let { cart_id } = filter ?? {};
+    let { cart_id, usr_id } = filter ?? {};
 
     if (cart_id) {
       queryBuilder.andWhere("bills.cart_id = :cart_id", { cart_id: filter.cart_id });
+    }
+    if (usr_id) {
+      queryBuilder.andWhere("bills.usr_id = :usr_id", { usr_id: filter.usr_id });
     }
   }
 

@@ -24,7 +24,7 @@ import { responseClient } from "../../utils";
 
 const RoleUser = {
   USER: "USER",
-  ADMIN: "ADMIN",
+  ADMINIE: "ADMINIE",
   EMPLOYEE: "EMPLOYEE",
 };
 

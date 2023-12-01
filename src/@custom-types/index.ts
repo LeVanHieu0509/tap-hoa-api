@@ -7,6 +7,6 @@ export enum TypeProduct {
 }
 
 export enum TypeRolesUser {
-  ADMIN = "ADMIN",
+  ADMINIE = "ADMINIE",
   USER = "USER",
 }

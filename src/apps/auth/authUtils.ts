@@ -1,7 +1,7 @@
 import { NextFunction } from "express";
 import { signJwt, signRefreshToken, verifyJwt } from "../../utils/auth";
 import { asyncHandler } from "../../helpers/asyncHandler";
-import { AuthFailureError, NotFoundError } from "../../core/error.response";
+import { AuthFailureError, BadRequestError, NotFoundError } from "../../core/error.response";
 import KeyTokenService from "../services/keyToken.service";
 import { findUserById } from "../services/user.service";
 
@@ -68,4 +68,19 @@ export const authentication = asyncHandler(async (req: RequestCustom, res: Respo
     throw error;
   }
   //6. ok all => return next()
+});
+
+export const routerPrivate = asyncHandler(async (req: RequestCustom, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.headers[HEADER.CLIENT_ID];
+    const user = await findUserById({ usr_id: userId });
+
+    if (user.usr_roles == "ADMINIE") {
+      next();
+    } else {
+      throw new BadRequestError("Bạn không có quyền truy cập!");
+    }
+  } catch (error) {
+    throw error;
+  }
 });
