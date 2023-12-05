@@ -89,11 +89,11 @@ export class Products {
 
   @Field()
   @Column({ type: "date", nullable: true })
-  public product_manufacture_date!: Date;
+  public product_manufacture_date?: Date;
 
   @Field()
   @Column({ type: "date", nullable: true })
-  public product_expired_date!: Date;
+  public product_expired_date?: Date;
 
   @Field()
   @Column()
