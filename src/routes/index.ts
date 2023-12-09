@@ -6,6 +6,7 @@ import checkout from "./checkout";
 import pdf from "./pdf";
 import products from "./products";
 import categories from "./categories";
+import dashboard from "./dashboard";
 
 function route(app) {
   app.use(
@@ -62,6 +63,14 @@ function route(app) {
       next();
     },
     categories
+  );
+
+  app.use(
+    "/v1/api/dashboard",
+    function (req, res, next) {
+      next();
+    },
+    dashboard
   );
 
   app.use((req, res, next) => {

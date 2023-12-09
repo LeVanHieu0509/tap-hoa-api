@@ -29,6 +29,7 @@ export const checkOrder = async ({ foundCarts }) => {
       product_code: foundProduct.product_code,
       product_name: foundProduct.product_name,
       product_price_sell: foundProduct.product_price_sell,
+      product_price_origin: foundProduct.product_price_origin,
       product_quantity_order: product_quantity,
       product_total_price: foundProduct.product_price_sell * product_quantity,
     };

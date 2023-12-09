@@ -1,25 +1,15 @@
 import { responseClient } from "../../../utils";
-import { MESSAGE_ADD_SUCCESS, MESSAGE_NOTFOUND } from "../../constants";
+import { MESSAGE_NOTFOUND, MESSAGE_SUCCESS } from "../../constants";
+import { totalMoneyOverview } from "./repo.service";
 
 export const getOverviewDashboard = async () => {
-  // Xem được thông tin hoá đơn
-  // Xem được thông tin khách hàng
-  // xem thông tin nhân viên nào order
-  // Xem sản phẩm trong bill, giá, .... (get tới cái mã cart)
-  const foundBill = 1;
+  const overview = await totalMoneyOverview();
 
-  //1. Tinh doanh thu
-  //2. Tính lợi nhuận
-  //3. Tính tổng hoá đơn
-  //4. Tính số lượng sản phẩm
-
-  //5. Get sản phẩm bán chạy
-
-  if (foundBill) {
+  if (overview) {
     return responseClient({
       status: "1",
-      data: foundBill,
-      message: MESSAGE_ADD_SUCCESS,
+      data: overview,
+      message: MESSAGE_SUCCESS,
     });
   } else {
     return responseClient({

@@ -31,6 +31,7 @@ export const addNewCarts = async (req) => {
       product_name: foundProduct.product_name,
       product_price_sell: foundProduct.product_price_sell,
       product_quantity: element.product_quantity,
+      product_price_origin: foundProduct.product_price_origin,
     });
   }
 
@@ -76,6 +77,7 @@ export const addToCarts = async (req) => {
         product_code: element.product_code,
         product_name: foundProduct.product_name,
         product_price_sell: foundProduct.product_price_sell,
+        product_price_origin: foundProduct.product_price_origin,
         product_quantity: element.product_quantity,
       });
     }
@@ -121,6 +123,7 @@ export const updateCarts = async (req) => {
         product_code: element.product_code,
         product_name: foundProduct.product_name,
         product_price_sell: foundProduct.product_price_sell,
+        product_price_origin: foundProduct.product_price_origin,
         product_quantity: element.product_quantity,
       });
     }

@@ -1,60 +1,53 @@
 import { getCustomRepository } from "typeorm";
 import { BillsRepository } from "../../repositories/bills.repository";
+import { ProductsRepository } from "../../repositories/products.reposiotory";
+import { countBy, flattenDeep, sortBy } from "lodash";
 
-export const findBillsByUser = async ({ cart_id }) => {
+export const totalMoneyOverview = async () => {
   const billsRepository = getCustomRepository(BillsRepository);
+  const queryBuilderBills = billsRepository.createQueryBuilder("bills");
 
-  const bills = await billsRepository.findOne({
-    cart: cart_id,
-  });
+  const productRepository = getCustomRepository(ProductsRepository);
+  const queryBuilderProduct = productRepository.createQueryBuilder("products");
 
-  return bills;
-};
-
-export const findBillsById = async ({ id }) => {
-  const billsRepository = getCustomRepository(BillsRepository);
-
-  const foundBill = await billsRepository.findOne({
-    id,
-  });
-
-  return foundBill;
-};
-
-export const findAllBills = async ({ limit, sortOrder, sortBy, page, filter, select }: any) => {
-  const billsRepository = getCustomRepository(BillsRepository);
-  const queryBuilder = billsRepository.createQueryBuilder("bills");
-
-  //query toi bang categories
-  queryBuilder.leftJoinAndSelect("bills.cart", "cart");
-
-  // Sort by column and order
-  if (sortBy && sortOrder) {
-    queryBuilder.orderBy(`bills.${sortBy}`, sortOrder.toUpperCase());
-  }
-  // Select specific columns
-  if (select) {
-    let selectFileds = select.map((item) => {
-      return `bills.${item}`;
-    });
-    queryBuilder.select(selectFileds);
-  }
-
-  if (filter) {
-    let { cart_id } = filter ?? {};
-
-    if (cart_id) {
-      queryBuilder.andWhere("bills.cart_id = :cart_id", { cart_id: filter.cart_id });
-    }
-  }
-
-  // Limit and offset
-  const skip = (page - 1) * limit;
-
-  queryBuilder.skip(skip).take(limit);
+  queryBuilderBills.select(["bills.total_price", "bills.cart_products", "bills.createdAt"]);
 
   // Execute query and count total records
-  const [products, total] = await queryBuilder.getManyAndCount();
+  const [products, total] = await queryBuilderBills.getManyAndCount();
+  const [a, quantityProduct] = await queryBuilderProduct.getManyAndCount();
 
-  return { products, total };
+  let listProductsOrder = {};
+  let totalProfit = 0;
+
+  products.forEach((item) => {
+    return JSON.parse(item.cart_products).forEach((element) => {
+      console.log(element);
+      totalProfit =
+        totalProfit + (element.product_price_sell - element.product_price_origin) * element.product_quantity_order;
+
+      if (listProductsOrder[element.id]?.id && element.id == listProductsOrder[element.id].id) {
+        listProductsOrder[element.id] = {
+          ...element,
+          product_quantity_order: listProductsOrder[element.id].product_quantity_order + element.product_quantity_order,
+          product_total_price: listProductsOrder[element.id].product_total_price + element.product_total_price,
+        };
+      } else {
+        listProductsOrder[element.id] = element;
+      }
+    });
+  });
+
+  const mapObject = Object.keys(listProductsOrder).map((item, index) => {
+    return listProductsOrder[item];
+  });
+
+  return {
+    totalProfit,
+    totalRevenue: products.reduce((sum, bill) => sum + bill.total_price, 0),
+    quantityBills: total,
+    quantityProduct,
+    listAllProduct: sortBy(mapObject, "product_quantity_order")
+      .slice(mapObject.length - 5, mapObject.length)
+      .reverse(),
+  };
 };
