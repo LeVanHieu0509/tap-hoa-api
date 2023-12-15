@@ -167,19 +167,16 @@ class AuthService {
     const decodeData: any = await verifyRefreshToken(refreshToken, keyToken.privateKey);
 
     return new Promise((resolve, reject) => {
-      client.del(`usr_id:${decodeData.usr_id.toString()}`, (err, reply) => {
-        if (err) reject(err);
-        if (reply == 1) {
-          resolve({
-            status: "1",
-            message: "logout success",
-          });
-        } else {
-          resolve({
-            status: "-1",
-            message: "logout failed",
-          });
-        }
+      // client.del(`usr_id:${decodeData.usr_id.toString()}`, (err, reply) => {
+      //   if (err) reject(err);
+      //   if (reply == 1) {
+      //     resolve({
+      //       status: "1",
+      //       message: "logout success",
+      //     });
+      resolve({
+        status: "1",
+        message: "logout success",
       });
     });
   };

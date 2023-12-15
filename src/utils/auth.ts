@@ -25,16 +25,16 @@ export const verifyRefreshToken = (token, key) => {
     jwt.verify(token, key, (err, payload) => {
       if (err) {
         reject(err);
-      } else
-        client.get(`usr_id:${payload.usr_id.toString()}`, (err, reply) => {
-          if (err) {
-            return reject(err);
-          }
-          if (reply == token) {
-            return resolve(payload);
-          }
-          return reject(new AuthFailureError("Unauthorized"));
-        });
+      } else return resolve(payload);
+      // client.get(`usr_id:${payload.usr_id.toString()}`, (err, reply) => {
+      //   if (err) {
+      //     return reject(err);
+      //   }
+      //   if (reply == token) {
+      //     return resolve(payload);
+      //   }
+      //   return reject(new AuthFailureError("Unauthorized"));
+      // });
     });
   });
 };
@@ -51,14 +51,13 @@ export const signRefreshToken = (payload, key, options) => {
       (err, token) => {
         if (err) {
           reject(err);
-        } else
-          client.set(`usr_id:${payload.usr_id.toString()}`, token, "EX", 365 * 24 * 60 * 60, (err, reply) => {
-            if (err) {
-              return reject(err);
-            }
-          });
-
-        resolve(token);
+        }
+        // client.set(`usr_id:${payload.usr_id.toString()}`, token, "EX", 365 * 24 * 60 * 60, (err, reply) => {
+        //   if (err) {
+        //     return reject(err);
+        //   }
+        // });
+        else resolve(token);
       }
     );
   });

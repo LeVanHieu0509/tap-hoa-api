@@ -37,7 +37,7 @@ const bootstrap = async () => {
     };
 
     require("./dbs/init.my-sql");
-    require("./dbs/init.redis");
+    // require("./dbs/init.redis");
 
     app.use(cors(corsConfig));
 

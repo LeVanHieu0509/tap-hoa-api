@@ -21,7 +21,6 @@ export const totalMoneyOverview = async () => {
 
   products.forEach((item) => {
     return JSON.parse(item.cart_products).forEach((element) => {
-      console.log(element);
       totalProfit =
         totalProfit + (element.product_price_sell - element.product_price_origin) * element.product_quantity_order;
 
