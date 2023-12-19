@@ -26,7 +26,7 @@ const bootstrap = async () => {
     app.use(compression());
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
-    app.use(express.static(path.join(__dirname, "public")));
+    // app.use(express.static(path.join(__dirname, "public")));
     // create TypeORM connection
     // await TypeORM.createConnection();
 

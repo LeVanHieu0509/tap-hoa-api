@@ -9,11 +9,11 @@ import { Content, StyleDictionary, TDocumentDefinitions, TFontDictionary } from 
 
 const window: DOMWindow = new JSDOM("").window;
 const fonts = {
-  "Arial.ttf": fs.readFileSync(path.join(__dirname, "../../fonts/Arial/Arial.ttf")).toString("base64"),
-  "Arial-Bold.ttf": fs.readFileSync(path.join(__dirname, "../../fonts/Arial/Arial-Bold.ttf")).toString("base64"),
-  "Arial-Italic.ttf": fs.readFileSync(path.join(__dirname, "../../fonts/Arial/Arial-Italic.ttf")).toString("base64"),
+  "Arial.ttf": fs.readFileSync(path.join(__dirname, "../../../fonts/Arial/Arial.ttf")).toString("base64"),
+  "Arial-Bold.ttf": fs.readFileSync(path.join(__dirname, "../../../fonts/Arial/Arial-Bold.ttf")).toString("base64"),
+  "Arial-Italic.ttf": fs.readFileSync(path.join(__dirname, "../../../fonts/Arial/Arial-Italic.ttf")).toString("base64"),
   "Arial-Bold-Italic.ttf": fs
-    .readFileSync(path.join(__dirname, "../../fonts/Arial/Arial-Bold-Italic.ttf"))
+    .readFileSync(path.join(__dirname, "../../../fonts/Arial/Arial-Bold-Italic.ttf"))
     .toString("base64"),
 };
 var defaultClientFonts: TFontDictionary = {
