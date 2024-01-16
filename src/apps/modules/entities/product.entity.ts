@@ -26,6 +26,7 @@ class SlugtifiedProductName {
 @Service()
 @Entity()
 @ObjectType()
+//comment
 @Unique(["product_code", "product_bar_code"])
 export class Products {
   @Field((_type) => Number)

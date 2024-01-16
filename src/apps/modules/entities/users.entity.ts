@@ -20,6 +20,7 @@ import { Bills } from "./bills.entity";
   schema: "utf8mb4_bin",
   synchronize: true,
 })
+//comment
 @Unique(["usr_id"])
 @Index("idx_email_age_name", ["usr_email", "usr_age", "usr_name"])
 @Index("idx_status", ["usr_status"])
