@@ -44,3 +44,7 @@ Thumbs.db
 .test.env
 /dist
 .nyc_output
+
+db
+config
+backup
