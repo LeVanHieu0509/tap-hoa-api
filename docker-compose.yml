@@ -1,13 +1,70 @@
+version: "3" # chọn viết theo bản 3 docs.docker.com/compose/compose-file/
+
+networks:
+  # TẠO NETWORK
+  my-networks:
+    driver: bridge
+
+volumes:
+  # TẠO Ổ ĐĨA
+  dir-site:
+    driver: local
+    # ổ đĩa này lưu dữ liệu ở /mycode/
+    driver_opts:
+      device: ${PWD}/backup # Hãy đảm bảo có thư mục /mycode/default
+      o: bind
+      type: none
+
 services:
-  web:
+  # Container My SQL
+  my-sql:
+    container_name: mysql-tap-hoa
+    image: mysql:8.0
+    restart: always
+    networks:
+      - my-networks
+
+    command: mysqld --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: 123abc
+      MYSQL_DATABASE: taphoa-db
+      #      MYSQL_USER: sandbox_user
+      #      MYSQL_PASSWORD: passpass
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - "3306:3306"
+    volumes:
+      - "./docker/db/data:/var/lib/mysql"
+      - "./docker/db/my.cnf:/etc/mysql/my.cnf"
+      - "./docker/db/sql:/docker-entrypoint-initdb.d"
+      - ${PWD}/db:/var/lib/mysql # Ánh xạ file từ máy host vào container có nghĩa là nếu sửa ở file ở máy host.
+
+  node-js:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: tap-hoa-be
     restart: always
+    depends_on:
+      - my-sql
+    networks:
+      - my-networks
+    volumes:
+      - dir-site:/home/sites
+    ports:
+      - 8888:3003
+
+  tap-hoa-fe:
+    build:
+      context: ../tap-hoa-fe
+      dockerfile: Dockerfile
+    container_name: tap-hoa-fe
+    restart: always
+    networks:
+      - my-networks
     volumes:
       - ./:/app
       - /app/node_modules
-      - /app/dist
+      - /app/.next
     ports:
-      - 8888:3003
+      - 9999:3000
