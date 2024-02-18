@@ -21,8 +21,8 @@ import { Bills } from "./bills.entity";
   synchronize: true,
 })
 @Unique(["usr_id"])
-@Index("idx_email_age_name", ["usr_email", "usr_age", "usr_name"])
-@Index("idx_status", ["usr_status"])
+// @Index("idx_email_age_name", ["usr_email", "usr_age", "usr_name"])
+// @Index("idx_status", ["usr_status"])
 
 //
 export class Users {

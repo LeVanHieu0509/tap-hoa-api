@@ -15,7 +15,7 @@ import { Bills } from "./bills.entity";
 
 @ObjectType()
 @Entity()
-@Unique(["cart_code"])
+// @Unique(["cart_code"])
 export class Carts {
   @Field((_type) => Number)
   @PrimaryGeneratedColumn()
